@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="hr">
+	<head>
+		<meta charset="UTF-8">
+		<title>Sinusoida</title>
+		<script type="module">
+			import GKS from "./GKS.js"
+			
+			var platno1 = document.getElementById("slika1");
+			if(!platno1) alert("Greška - nema platna!");
+		
+			let gks = new GKS(platno1,-1,7, -2,2)
+			
+			let x;
+			let y;
+			gks.postaviNa(0,0)
+			for(let t = 0; t<=2*Math.PI;t+=0.01)
+			{
+				x = t
+				y = Math.sin(t)
+
+
+				gks.linijaDo(x,y)
+				gks.koristiBoju('red')
+				gks.povuciLiniju()
+			}
+
+		</script>
+	</head>
+
+	<body>
+		<h1>Sinusoida </h1>
+		<div>
+			<canvas id="slika1" width="500" height="500" style="border:5px solid black">
+				Vaš preglednik ne podržava HTML5 canvas.
+			</canvas>
+		</div>
+	</div>
+	</body>
+</html>

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="hr">
+	<head>
+		<meta charset="UTF-8">
+		<title>Parabola</title>
+		<script>
+		  window.onload = canApp;
+
+		  function canApp() {
+		  	
+		  	var platno1 = document.getElementById("slika1");
+			if(!platno1) alert("Greška - nema platna!");
+			var w = platno1.width;
+			var h = platno1.height;
+			var g = platno1.getContext("2d");
+
+            var posx = w;
+            var posy = h;
+			let gap = 40;
+
+			let xMax = 2*Math.PI
+			let xMin = 0
+			let yMax = 2
+			let yMin = -2
+
+			let transformationX = w/(xMax - xMin)
+			let transformationY = h/(yMax - yMin)
+
+			let ishodisteX = transformationX * Math.abs(xMin)
+			let ishodisteY = transformationY * Math.abs(yMin)
+
+            slikajKoordinatniSustav(xMin, xMax, yMin, yMax);
+			slikajSinusoidu(xMin, xMax, yMin, yMax)
+			
+			function slikajKoordinatniSustav() {
+                //pozadina
+                g.fillStyle = "#FFFFE0";
+                g.fillRect(0, 0, w, h);
+
+				//crtanje linije
+				g.beginPath();
+				
+				
+				// x with numbers
+				g.moveTo(0, ishodisteY);
+				for(let i = xMin, step = 0; i < xMax; i++,step+=transformationX){
+					g.font = "2vw Arial";
+					g.fillStyle = "black"
+					g.textAlign = 'right'
+					g.fillText(i,step-1,ishodisteY)
+					g.lineTo(step+transformationX,ishodisteY)
+				}
+
+				// y with numbers
+				g.moveTo(ishodisteX, 0);
+				for(let i = yMin, step = 0; i < yMax; i++,step+=transformationY){
+					g.font = "2vw Arial";
+					g.fillStyle = "black"
+					g.textAlign = 'right'
+					g.fillText(i,ishodisteX-1,step)
+					g.lineTo(ishodisteX, step+transformationY)
+				}
+
+				g.strokeStyle = "black";
+				g.stroke();
+			}
+
+			function slikajSinusoidu(xMin, xMax, yMin, yMax) {
+				g.beginPath();
+				
+				g.moveTo(ishodisteX,ishodisteY)
+				for(let i = 0;i <= xMax; i+=0.01)
+				{
+					g.lineTo(ishodisteX + i*transformationX, ishodisteY - Math.sin(i)*transformationY)
+				}
+
+				g.strokeStyle = "red";
+				g.stroke();
+			}
+
+		}
+		</script>
+	</head>
+
+	<body>
+		<h1>Parabola </h1>
+		<div>
+			<canvas id="slika1" width="500" height="500" style="border:5px solid black">
+				Vaš preglednik ne podržava HTML5 canvas.
+			</canvas>
+		</div>
+	</div>
+	</body>
+</html>

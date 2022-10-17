@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="hr">
+	<head>
+		<meta charset="UTF-8">
+		<title>Miš i linija</title>
+		<script>
+		  window.onload = canApp;
+
+		  function canApp() {
+		  	
+		  	var platno1 = document.getElementById("slika1");
+			if(!platno1) alert("Greška - nema platna!");
+			var w = platno1.width;
+			var h = platno1.height;
+			var g = platno1.getContext("2d");
+
+            var posx = w;
+            var posy = h;
+			let gap = 40;
+            slikaj(gap);
+			
+			function slikaj(lineGap) {
+                //pozadina
+                g.fillStyle = "#FFFFE0";
+                g.fillRect(0, 0, w, h);
+
+				//crtanje linije
+				g.beginPath();
+				g.moveTo(0, 0);
+				for(let i = 0; i < lineGap; i++)
+				{	
+					g.lineTo(posx,  i*lineGap);
+					g.moveTo(0, (i+1)*lineGap);
+				}
+				for(let i = 0; i < lineGap; i++)
+				{	
+					g.lineTo(i*lineGap,  posy);
+					g.moveTo((i+1)*lineGap,0 );
+				}
+				
+				g.strokeStyle = "red";
+				g.stroke();
+			}
+
+		}
+		</script>
+	</head>
+
+	<body>
+		<h1>Crtanje u zaslonskim koordinatama </h1>
+		<div>
+			<canvas id="slika1" width="500" height="500" style="border:5px solid black">
+				Vaš preglednik ne podržava HTML5 canvas.
+			</canvas>
+		</div>
+	</div>
+	</body>
+</html>

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="hr">
+	<head>
+		<meta charset="UTF-8">
+		<title>Parabola</title>
+		<script type="module">
+			import GKS from "./GKS.js"
+			// sus, mozda viska
+		 	window.onload = canApp;
+		  
+		  function canApp() {
+		  	
+		  	var platno1 = document.getElementById("slika1");
+			if(!platno1) alert("Greška - nema platna!");
+		
+			let gks = new GKS(platno1, -1,2,-1,2)
+		
+          
+
+		}
+		</script>
+	</head>
+
+	<body>
+		<h1>Parabola </h1>
+		<div>
+			<canvas id="slika1" width="500" height="500" style="border:5px solid black">
+				Vaš preglednik ne podržava HTML5 canvas.
+			</canvas>
+		</div>
+	</div>
+	</body>
+</html>

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="hr">
+	<head>
+		<meta charset="UTF-8">
+		<title>Parabola</title>
+		<script>
+		  window.onload = canApp;
+
+		  function canApp() {
+		  	
+		  	var platno1 = document.getElementById("slika1");
+			if(!platno1) alert("Greška - nema platna!");
+			var w = platno1.width;
+			var h = platno1.height;
+			var g = platno1.getContext("2d");
+
+            var posx = w;
+            var posy = h;
+			let gap = 40;
+
+			let xMax = 5
+			let xMin = -5
+			let yMax = 5
+			let yMin = -5
+
+			let transformationX = w/(xMax - xMin)
+			let transformationY = h/(yMax - yMin)
+
+            slikajKoordinatniSustav(xMin, xMax, yMin, yMax);
+			slikajParabolu(xMin, xMax, yMin, yMax)
+			
+			function slikajKoordinatniSustav() {
+                //pozadina
+                g.fillStyle = "#FFFFE0";
+                g.fillRect(0, 0, w, h);
+
+				//crtanje linije
+				g.beginPath();
+				// X os
+				// g.moveTo(0, h/2);
+				// g.lineTo(w,h/2);
+				// Y os
+				g.moveTo(w/2, 0);
+				g.lineTo(w/2,h);
+				
+				// x with numbers
+				g.moveTo(0, h/2);
+				for(let i = xMin, step = 0; i < xMax; i++,step+=transformationX){
+					g.font = "2vw Arial";
+					g.fillStyle = "black"
+					g.textAlign = 'right'
+					g.fillText(i,step-1,h/2)
+					g.lineTo(step+transformationX,h/2)
+				}
+
+				// y with numbers
+				g.moveTo(w/2, 0);
+				for(let i = yMin, step = 0; i < yMax; i++,step+=transformationY){
+					g.font = "2vw Arial";
+					g.fillStyle = "black"
+					g.textAlign = 'right'
+					g.fillText(i,w/2-1,step)
+					g.lineTo(w/2, step+transformationY)
+				}
+
+				g.strokeStyle = "black";
+				g.stroke();
+			}
+
+			function slikajParabolu(xMin, xMax, yMin, yMax) {
+				g.beginPath();
+				
+				g.moveTo(w/2, h/2 + 3*transformationY);
+				g.lineTo(w, h/2 + 3*transformationY)
+
+				g.moveTo(w/2, h/2 + 3*transformationY);
+				for(let i = 0; i < xMax; i+=0.1){
+					g.lineTo(w/2+i*transformationX, h/2 + (3-Math.pow(i,2)/2)*transformationY)
+				}
+				g.moveTo(w/2, h/2 + 3*transformationY);
+				for(let i = 0; i > xMin; i-=0.1){
+					g.lineTo(w/2+i*transformationX, h/2 + (3-Math.pow(i,2)/2)*transformationY)
+				}
+
+				g.strokeStyle = "red";
+				g.stroke();
+			}
+
+		}
+		</script>
+	</head>
+
+	<body>
+		<h1>Parabola </h1>
+		<div>
+			<canvas id="slika1" width="500" height="500" style="border:5px solid black">
+				Vaš preglednik ne podržava HTML5 canvas.
+			</canvas>
+		</div>
+	</div>
+	</body>
+</html>
