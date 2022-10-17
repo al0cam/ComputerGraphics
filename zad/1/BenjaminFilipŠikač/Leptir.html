@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="hr">
+	<head>
+		<meta charset="UTF-8">
+		<title>Leptir</title>
+		<script type="text/javascript" src="GKS.js"></script>
+		<script type="text/javascript">
+
+			window.addEventListener('load', (event) => {
+				var platno1 = document.getElementById("slika1");
+				if(!platno1) alert("Greška - nema platna!");
+			
+				let gks = new GKS(platno1, -5,5,-5,5)
+				
+				let x;
+				let y;
+				let ePowCosT;
+				let cos4t; 
+				let sin5t12;
+				gks.postaviNa(0,0)
+				for(let t = 0; t<=12*Math.PI;t+=0.01)
+				{
+					ePowCosT = Math.pow(Math.E,Math.cos(t))
+					cos4t = Math.cos(4*t) 
+					sin5t12 = Math.pow(Math.sin(t/12),5)
+					x = (ePowCosT - 2*cos4t + sin5t12)*Math.sin(t)
+					y = (ePowCosT - 2*cos4t + sin5t12)*Math.cos(t)
+
+					gks.linijaDo(x,y)
+					gks.koristiBoju('red')
+					gks.povuciLiniju()
+				}
+
+			});
+		</script>
+	</head>
+
+	<body>
+		<h1>Leptir </h1>
+		<div>
+			<canvas id="slika1" width="500" height="500" style="border:5px solid black">
+				Vaš preglednik ne podržava HTML5 canvas.
+			</canvas>
+		</div>
+	</div>
+	</body>
+</html>
