@@ -3,31 +3,32 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>Cvijet</title>
-		<script type="module">
-			import GKS from "./GKS.js"
+		<script type="text/javascript" src="GKS.js"></script>
+		<script type="text/javascript">
+			window.addEventListener('load', (event) => {
+				var platno1 = document.getElementById("slika1");
+				if(!platno1) alert("Greška - nema platna!");
 			
-			var platno1 = document.getElementById("slika1");
-			if(!platno1) alert("Greška - nema platna!");
-		
-			let gks = new GKS(platno1,-5,5,-5,5)
-			
-			let x;
-			let y;
-			let r;
-			gks.postaviNa(0,0)
-			for(let a = 2; a>=0;a-=0.2)
-				for(let i = 0; i<=2*Math.PI;i+=0.05)
-				{
-					r = a*Math.cos(4*i)
-					x = r*Math.cos(i)
-					y= r*Math.sin(i)
+				let gks = new GKS(platno1,-5,5,-5,5)
+				
+				let x;
+				let y;
+				let r;
+				gks.postaviNa(0,0)
+				for(let a = 2; a>=0;a-=0.2)
+					for(let i = 0; i<=2*Math.PI;i+=0.05)
+					{
+						r = a*Math.cos(4*i)
+						x = r*Math.cos(i)
+						y= r*Math.sin(i)
 
 
-					gks.linijaDo(x,y)
-					gks.koristiBoju('red')
-					gks.povuciLiniju()
-				}
+						gks.linijaDo(x,y)
+						gks.koristiBoju('red')
+						gks.povuciLiniju()
+					}
 
+			});
 		</script>
 	</head>
 

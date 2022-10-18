@@ -1,4 +1,4 @@
-export default class {
+class GKS {
     w;
     h;
     transformationX;
@@ -51,7 +51,7 @@ export default class {
             this.g.lineTo(step+this.transformationX,this.originY)
 
             if(i == 0) continue
-                this.g.font = "2vw Arial";
+                this.g.font = "1em Arial";
                 this.g.fillStyle = "black"
                 this.g.textAlign = 'center'
                 this.g.fillText(i,step,this.originY - (this.h*0.02))
@@ -67,7 +67,7 @@ export default class {
             this.g.lineTo(this.originX, step+this.transformationY)
 
             if(i == 0) continue
-                this.g.font = "2vw Arial";
+                this.g.font = "1em Arial";
                 this.g.fillStyle = "black"
                 this.g.textAlign = 'center'
                 this.g.textBaseline = 'middle'
