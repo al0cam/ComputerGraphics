@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="hr">
+	<head>
+		<meta charset="UTF-8">
+		<title>Elipsa</title>
+		<script type="text/javascript" src="GKS.js"></script>
+		<script type="text/javascript">
+			window.addEventListener('load', (event) => {
+				var platno1 = document.getElementById("slika1");
+				if(!platno1) alert("Greška - nema platna!");
+			
+				let gks = new GKS(platno1, -5,5,null,null)
+
+
+				let a = 4;
+				let b = 2;
+
+				let x;
+				let y;
+				gks.postaviNa(a,0)
+				for(let t = 0; t<=2*Math.PI;t+=0.01)
+				{
+					x = a*Math.cos(t)
+					y = b*Math.sin(t)
+
+
+					gks.linijaDo(x,y)
+					gks.koristiBoju('red')
+				}
+
+				let r = 4
+				for(let t = 0; t<=2*Math.PI;t+=0.01)
+				{
+					x = r*Math.cos(t)
+					y = r*Math.sin(t)
+
+					gks.linijaDo(x,y)
+					gks.koristiBoju('red')
+				}
+				gks.povuciLiniju()
+
+
+			});
+		</script>
+	</head>
+
+	<body>
+		<h1>Parabola </h1>
+		<div>
+			<canvas id="slika1" width="600" height="500" style="border:5px solid black">
+				Vaš preglednik ne podržava HTML5 canvas.
+			</canvas>
+		</div>
+	</div>
+	</body>
+</html>
