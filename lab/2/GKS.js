@@ -23,12 +23,8 @@ class GKS {
             this.transformationX = this.w/(xMax - xMin)
             this.transformationY = this.transformationX       
 
-        
-
             this.yMin = -(this.h/this.transformationY)/2
             this.yMax = (this.h/this.transformationY)/2
-
-            console.log(this.transformationY, this.h/(this.yMax - this.yMin)); 
         }
         else{
             this.xMin = xMin
@@ -61,7 +57,6 @@ class GKS {
         //crtanje linije
         this.g.beginPath();
         
-        
         // x with numbers
         this.g.moveTo(0, this.originY);
         for(let i = this.xMin, step = 0; i < this.xMax; i++,step+=this.transformationX){
@@ -77,11 +72,12 @@ class GKS {
                 this.g.textAlign = 'center'
                 this.g.fillText(Math.round(i),step,this.originY - (this.h*0.02))
         }
-
+        
         // y with numbers
         this.g.moveTo(this.originX, 0);
-        for(let i = this.yMin,step = 0,j=0; i < this.yMax; i++,j++,step+=(1-Math.abs((Math.round(i)-i)))*this.transformationY){
-            
+        console.log("yMin: ",this.yMin, Math.round(this.yMin),Math.abs(Math.round(this.yMin)-this.yMin),this.yMin + Math.abs(Math.round(this.yMin)-this.yMin));
+        for(let i = this.yMin,step = 0,j=0; i < this.yMax; i+=1-(Math.round(i)-i),j++,step+=(1-Math.abs((Math.round(i)-i)))*this.transformationY){
+            console.log((Math.abs(Math.round(i)-i))*this.transformationY);
             console.log("i",i,"j",j,"step",step,"next",step+((1-Math.abs((Math.round(i)-i)))*this.transformationY));
             this.g.moveTo(this.originX - (this.h*0.01), step)
             this.g.lineTo(this.originX + (this.h*0.01), step)
