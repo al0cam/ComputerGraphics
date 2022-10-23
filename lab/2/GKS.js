@@ -26,6 +26,17 @@ class GKS {
             this.yMin = -(this.h/this.transformationY)/2
             this.yMax = (this.h/this.transformationY)/2
         }
+        else if(xMin == null || xMax == null)
+        {
+            this.yMin = yMin
+            this.yMax = yMax
+
+            this.transformationY = this.h/(yMax - yMin)
+            this.transformationX = this.transformationY       
+
+            this.xMin = -(this.w/this.transformationX)/2
+            this.xMax = (this.w/this.transformationX)/2
+        }
         else{
             this.xMin = xMin
             this.xMax = xMax
@@ -58,43 +69,79 @@ class GKS {
         this.g.beginPath();
         
         // x with numbers
+        let isiFloat;
         this.g.moveTo(0, this.originY);
-        for(let i = this.xMin, step = 0; i < this.xMax; i++,step+=this.transformationX){
+        for(let i = this.xMin, step = 0; i < this.xMax; ){
             
-            this.g.moveTo(step, this.originY - (this.h*0.01))
-            this.g.lineTo(step,this.originY + (this.h*0.01))
+            isiFloat = Math.round(i) != i
+
+            if(!isiFloat)
+            {
+                this.g.moveTo(step, this.originY - (this.h*0.01))
+                this.g.lineTo(step,this.originY + (this.h*0.01))
+            }
             this.g.moveTo(step,this.originY)
             this.g.lineTo(step+this.transformationX,this.originY)
 
-            if(i == 0) continue
+            if(i != 0 && !isiFloat)
+            {
                 this.g.font = "1em Arial";
                 this.g.fillStyle = "black"
                 this.g.textAlign = 'center'
                 this.g.fillText(Math.round(i),step,this.originY - (this.h*0.02))
+            }
+            
+            if(isiFloat)
+            {
+                let excess = Math.abs(Math.round(i) - i)
+                i += excess
+                step +=this.transformationX*excess
+            }
+            else{
+                i++
+                step+=this.transformationX
+            }
         }
         
         // y with numbers
         this.g.moveTo(this.originX, 0);
-        console.log("yMin: ",this.yMin, Math.round(this.yMin),Math.abs(Math.round(this.yMin)-this.yMin),this.yMin + Math.abs(Math.round(this.yMin)-this.yMin));
-        for(let i = this.yMin,step = 0,j=0; i < this.yMax; i+=1-(Math.round(i)-i),j++,step+=(1-Math.abs((Math.round(i)-i)))*this.transformationY){
-            console.log((Math.abs(Math.round(i)-i))*this.transformationY);
-            console.log("i",i,"j",j,"step",step,"next",step+((1-Math.abs((Math.round(i)-i)))*this.transformationY));
-            this.g.moveTo(this.originX - (this.h*0.01), step)
-            this.g.lineTo(this.originX + (this.h*0.01), step)
-            this.g.moveTo(this.originX, step)
-            this.g.lineTo(this.originX, step+((1-Math.abs((Math.round(i)-i)))*this.transformationY))
+        for(let i = this.yMax, step = 0; i > this.yMin; ){
 
-            if(i == 0) continue
+            isiFloat = Math.round(i) != i
+            if(!isiFloat)
+            {
+                this.g.moveTo(this.originX  -(this.h*0.01), step)
+                this.g.lineTo(this.originX + (this.h*0.01), step)
+            }
+
+            this.g.moveTo(this.originX, step)
+            this.g.lineTo(this.originX, step+this.transformationY)
+
+            if(i != 0 && !isiFloat){
                 this.g.font = "1em Arial";
                 this.g.fillStyle = "black"
                 this.g.textAlign = 'center'
                 this.g.textBaseline = 'middle'
-                this.g.fillText(Math.round(i),this.originX + (this.w*0.03),this.h - step)
+                this.g.fillText(i,this.originX + (this.w*0.03), step)
+            } 
+                
+            if(isiFloat)
+            {
+                let excess = Math.abs(Math.round(i) - i)
+                i -= excess
+                step +=this.transformationY*excess
+            }
+            else{
+                i--
+                step+=this.transformationY
+            }
         }
 
         this.g.strokeStyle = "black";
         this.g.stroke();
     }
+
+
 
 
     postaviNa(x,y)
