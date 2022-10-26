@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="hr">
+	<head>
+		<meta charset="UTF-8">
+		<title>Elipsa</title>
+		<script type="text/javascript" src="GKS.js"></script>
+		<script type="text/javascript" src="MT2D m.js"></script>
+		<script type="text/javascript">
+			window.addEventListener('load', (event) => {
+				var platno1 = document.getElementById("slika1");
+				if(!platno1) alert("Greška - nema platna!");
+			
+				let gks = new GKS(platno1, -10,10,-5,5)
+				let mt2d = new MT2D()
+
+				mt2d.pomakni(4,0)
+				mt2d.rotiraj(-30)
+				gks.trans(mt2d)
+
+				let a = 6;
+				let b = 3;
+
+				let x;	
+				let y;
+
+				for(let t = 0; t<=2*Math.PI;t+=0.01)
+				{
+					x = a*Math.cos(t)
+					y = b*Math.sin(t)
+
+					gks.linijaDo(x,y)
+					gks.koristiBoju('red')
+				}
+				gks.povuciLiniju()
+
+
+				gks.pocniPut()
+
+				mt2d.identitet()
+				mt2d.rotiraj(-30)
+				mt2d.pomakni(4,0)
+				gks.trans(mt2d)
+
+				a = 6;
+				b = 3;
+
+				for(let t = 0; t<=2*Math.PI;t+=0.01)
+				{
+					x = a*Math.cos(t)
+					y = b*Math.sin(t)
+
+					gks.linijaDo(x,y)
+					gks.koristiBoju('blue')
+				}
+
+				gks.povuciLiniju()
+
+
+				gks.pocniPut()
+
+				mt2d.identitet()
+				mt2d.rotiraj(75)
+				mt2d.pomakni(3,0)
+				
+				// console.log("prije zrcaljenje",mt2d.matrica);
+				mt2d.zrcaliNaY()
+				// console.log("zrcaljenje",mt2d.matrica);
+
+				gks.trans(mt2d)
+
+				a = 4;
+				b = 1;
+
+				for(let t = 0; t<=2*Math.PI;t+=0.01)
+				{
+					x = a*Math.cos(t)
+					y = b*Math.sin(t)
+
+					gks.linijaDo(x,y)
+					gks.koristiBoju('green')
+				}
+
+				gks.povuciLiniju()
+
+
+				gks.pocniPut()
+
+				mt2d.identitet()
+				mt2d.rotiraj(75)
+				mt2d.pomakni(3,0)
+
+				gks.trans(mt2d)
+
+				a = 4;
+				b = 1;
+
+				for(let t = 0; t<=2*Math.PI;t+=0.01)
+				{
+					x = a*Math.cos(t)
+					y = b*Math.sin(t)
+
+					gks.linijaDo(x,y)
+					gks.koristiBoju('green')
+				}
+
+				gks.povuciLiniju()
+			});
+		</script>
+	</head>
+
+	<body>
+		<h1>Parabola </h1>
+		<div>
+			<canvas id="slika1" width="600" height="500" style="border:5px solid black">
+				Vaš preglednik ne podržava HTML5 canvas.
+			</canvas>
+		</div>
+	</div>
+	</body>
+</html>
