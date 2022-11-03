@@ -45,22 +45,38 @@ class MT2D {
         this.mnozi(m);
     }
     rotiraj(kut){
-        let kutURadijanima = kut * Math.PI / 180;
+        let radijani = kut * Math.PI / 180;
         let m = [
-            [Math.cos(kutURadijanima),-Math.sin(kutURadijanima),0],
-            [Math.sin(kutURadijanima),Math.cos(kutURadijanima),0],
+            [Math.cos(radijani),-Math.sin(radijani),0],
+            [Math.sin(radijani),Math.cos(radijani),0],
             [0,0,1]
         ];
         this.mnozi(m);
     }
     smicanje(kut){
-        let kutURadijanima = kut * Math.PI / 180;
+        let radijani = kut * Math.PI / 180;
         let m = [
-            [1,Math.tan(kutURadijanima),0],
-            [Math.tan(kutURadijanima),1,0],
+            [1,Math.tan(radijani),0],
+            [Math.tan(radijani),1,0],
             [0,0,1]
         ];
         this.mnozi(m);
+    }
+
+    zrcaliNa(k, l) {
+        let alfa = Math.atan(k)*180/Math.PI;
+        this.pomakni(0, l);
+        this.rotiraj(alfa);
+        this.zrcaliNaX();
+        this.rotiraj(-alfa);
+        this.pomakni(0, -l);
+	}
+
+    rotirajOkoTocke(u,v,kut)
+    {
+        this.pomakni(-u,-v)
+        this.rotiraj(kut)
+        this.pomakni(u,v)
     }
 
     mnozi(m){

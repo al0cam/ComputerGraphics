@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="hr">
+	<head>
+		<meta charset="UTF-8">
+		<title>Elipsa</title>
+		<script type="text/javascript" src="GKS.js"></script>
+		<script type="text/javascript" src="MT2D.js"></script>
+		<script type="text/javascript">
+			let gks;
+			let mt2d;
+
+			window.addEventListener('load', (event) => {
+
+				let platno1 = document.getElementById("slika1");	
+				if(!platno1) alert("Greška - nema platna!");
+				
+				gks = new GKS(platno1, -15,15,-1,15)
+				mt2d = new MT2D()
+
+				traktor()
+				
+
+				let k = 3
+				let l = 
+				mt2d.identitet()
+				gks.trans(mt2d)
+				gks.postaviNa(gks.xMin,(3*gks.xMin+6))
+				gks.linijaDo(gks.xMax,(3*gks.xMax+6))
+				gks.povuciLiniju()
+
+				zrcaljeniTraktor()
+
+			});
+
+			function traktor()
+			{
+				gks.koristiBoju("red")
+				mt2d.identitet()
+				mt2d.pomakni(2,2)
+				// mt2d.skaliraj(1,2)
+				gks.trans(mt2d)
+				pravokutnik(4,4)
+
+				mt2d.identitet()
+				mt2d.pomakni(6,2)
+				// mt2d.skaliraj(1,2)
+				gks.trans(mt2d)
+				pravokutnik(2,6)
+
+				mt2d.identitet()
+				mt2d.pomakni(5,8)
+				// mt2d.skaliraj(1,2)
+				gks.trans(mt2d)
+				pravokutnik(3,1)
+
+				mt2d.identitet()
+				mt2d.pomakni(3,6)
+				// mt2d.skaliraj(1,2)
+				gks.trans(mt2d)
+				pravokutnik(0.2,2)
+
+				mt2d.identitet()
+				mt2d.pomakni(2,2)
+				// mt2d.skaliraj(1,2)
+				gks.trans(mt2d)
+				elipsa(2,2)
+
+				mt2d.identitet()
+				mt2d.pomakni(8,3)
+				// mt2d.skaliraj(1,2)
+				gks.trans(mt2d)
+				elipsa(3,3)
+			}
+
+			function zrcaljeniTraktor()
+			{
+
+				gks.koristiBoju('green')
+				mt2d.identitet()
+				mt2d.zrcaliNa(3,6)
+				mt2d.pomakni(2,2)
+				// mt2d.skaliraj(1,2)
+				gks.trans(mt2d)
+				pravokutnik(4,4)
+
+				mt2d.identitet()
+				mt2d.zrcaliNa(3,6)
+				mt2d.pomakni(6,2)
+				// mt2d.skaliraj(1,2)
+				gks.trans(mt2d)
+				pravokutnik(2,6)
+
+				mt2d.identitet()
+				mt2d.zrcaliNa(3,6)
+				mt2d.pomakni(5,8)
+				// mt2d.skaliraj(1,2)
+				gks.trans(mt2d)
+				pravokutnik(3,1)
+
+				mt2d.identitet()
+				mt2d.zrcaliNa(3,6)
+				mt2d.pomakni(3,6)
+				// mt2d.skaliraj(1,2)
+				gks.trans(mt2d)
+				pravokutnik(0.2,2)
+
+				mt2d.identitet()
+				mt2d.zrcaliNa(3,6)
+				mt2d.pomakni(2,2)
+				// mt2d.skaliraj(1,2)
+				gks.trans(mt2d)
+				elipsa(2,2)
+
+				mt2d.identitet()
+				mt2d.zrcaliNa(3,6)
+				mt2d.pomakni(8,3)
+				// mt2d.skaliraj(1,2)
+				gks.trans(mt2d)
+				elipsa(3,3)
+			}
+
+			function elipsa(a,b)
+			{
+				gks.pocniPut()
+				let x;	
+				let y;
+				for(let t = 0; t<=2*Math.PI;t+=0.01)
+				{
+					x = a*Math.cos(t)
+					y = b*Math.sin(t)
+
+					gks.linijaDo(x,y)
+					// gks.koristiBoju('red')
+				}
+				gks.povuciLiniju()
+			}
+
+			function pravokutnik(a,b)
+			{
+				gks.pocniPut()
+				// gks.postaviNa(0,0)
+				gks.linijaDo(a,0)
+				gks.linijaDo(a,b)
+				gks.linijaDo(0,b)
+				gks.linijaDo(0,0)
+				gks.linijaDo(a,0)
+
+				// gks.koristiBoju('red')
+				gks.povuciLiniju()
+			}
+		</script>
+	</head>
+
+	<body>
+		<h1>Parabola </h1>
+		<div>
+			<canvas id="slika1" width="600" height="500" style="border:5px solid black">
+				Vaš preglednik ne podržava HTML5 canvas.
+			</canvas>
+		</div>
+	</div>
+	</body>
+</html>

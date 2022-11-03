@@ -6,7 +6,7 @@ class GKS {
     originX;
 	originY;
     g;
-    #mt2d = null;
+    #matrica = null;
 
     constructor(platno, xMin, xMax, yMin, yMax)
     {
@@ -50,9 +50,10 @@ class GKS {
 
         this.originX = this.sX * Math.abs(this.xMin)
         this.originY = this.h - this.sY * Math.abs(this.yMin)
+        this.identitet()
         this.slikajKoordinatniSustav()
 
-        this.g.beginPath()
+        // this.g.beginPath()
     }
 
 
@@ -151,23 +152,17 @@ class GKS {
     }
     linijaDo(x,y)
     {
-        let xCrta
-        let yCrta
+        let xCrta = this.#matrica[0][0]*x +
+         this.#matrica[0][1]*y + this.#matrica[0][2]
+        let yCrta = this.#matrica[1][0]*x + 
+         this.#matrica[1][1]*y + this.#matrica[1][2]
 
-        if(this.#mt2d != null){
-            // xCrta = this.#mt2d.matrica[0][0]*x + this.#mt2d.matrica[0][1]*y + this.#mt2d.matrica[0][2]
-            // yCrta = this.#mt2d.matrica[1][0]*x + this.#mt2d.matrica[1][1]*y + this.#mt2d.matrica[1][2]
-            xCrta = this.#mt2d.matrix[0][0]*x + this.#mt2d.matrix[0][1]*y + this.#mt2d.matrix[0][2]
-            yCrta = this.#mt2d.matrix[1][0]*x + this.#mt2d.matrix[1][1]*y + this.#mt2d.matrix[1][2]
-        } 
-        else{
-            xCrta = x;
-            yCrta = y;
-        }
+        // console.log("xCrta:" , xCrta, this.#matrica[0][0]*x , this.#matrica[0][1]*y , this.#matrica[0][2]);
 
         let xPix = this.originX + xCrta*this.sX
         let yPix = this.originY - yCrta*this.sY
         this.g.lineTo(xPix, yPix);
+
     }
     koristiBoju(boja)
     {
@@ -178,10 +173,17 @@ class GKS {
         this.g.stroke()
     }
 
-    trans(m){
-
-        this.#mt2d = m
-        
+    identitet(){
+        this.#matrica = [
+            [1,0,0],
+            [0,1,0],
+            [0,0,1]
+        ];
     }
+
+    trans(mt2d){
+        this.#matrica = mt2d.matrica
+    }
+
 
 }

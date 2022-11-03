@@ -13,9 +13,10 @@
 				let gks = new GKS(platno1, -10,10,-5,5)
 				let mt2d = new MT2D()
 
-				// RED START
+				gks.pocniPut()
+				mt2d.zrcaliNaY()
 				mt2d.pomakni(4,0)
-				mt2d.rotiraj(-30)
+				mt2d.rotiraj(30)
 				gks.trans(mt2d)
 
 				let a = 6;
@@ -33,48 +34,13 @@
 					gks.koristiBoju('red')
 				}
 				gks.povuciLiniju()
-				// RED END
 
-				// BLUE START
 				gks.pocniPut()
-
-				mt2d.identitet()
-				mt2d.rotiraj(-30)
-				mt2d.pomakni(4,0)
-				gks.trans(mt2d)
-
-				a = 6;
-				b = 3;
-
-				for(let t = 0; t<=2*Math.PI;t+=0.01)
-				{
-					x = a*Math.cos(t)
-					y = b*Math.sin(t)
-
-					gks.linijaDo(x,y)
-					gks.koristiBoju('blue')
-				}
-
-				gks.povuciLiniju()
-				// BLUE END
-
-				// GREEN START
-				gks.pocniPut()
-
-				mt2d.identitet()
-
-				// mt2d.rotiraj(75)
-				// mt2d.pomakni(3,0)
-				// mt2d.zrcaliNaY()
-
+				mt2d.rotirajOkoTocke(1,1,45)
 				mt2d.zrcaliNaY()
-				mt2d.pomakni(3,0)
-				mt2d.rotiraj(75)
-
+				mt2d.pomakni(4,0)
+				mt2d.rotiraj(30)
 				gks.trans(mt2d)
-
-				a = 4;
-				b = 1;
 
 				for(let t = 0; t<=2*Math.PI;t+=0.01)
 				{
@@ -82,12 +48,45 @@
 					y = b*Math.sin(t)
 
 					gks.linijaDo(x,y)
-					gks.koristiBoju('green')
+					gks.koristiBoju('red')
 				}
-
 				gks.povuciLiniju()
 
-				// GREEN END
+				
+				gks.pocniPut()
+
+				mt2d.identitet()
+				// mt2d.pomakni(4,0)
+				// mt2d.rotiraj(90)
+				// mt2d.zrcaliNaY()
+				gks.postaviNa(0,0)
+				gks.trans(mt2d)
+
+				x = 1
+				y = 1
+
+				gks.linijaDo(x,y)
+				gks.koristiBoju('red')
+				gks.povuciLiniju()
+
+
+				gks.pocniPut()
+
+				mt2d.identitet()
+				mt2d.rotirajOkoTocke(1,2,45)
+				// mt2d.pomakni(4,0)
+				// mt2d.rotiraj(90)
+				// mt2d.zrcaliNaY()
+				// gks.postaviNa(0,0)
+				gks.trans(mt2d)
+
+				x = 1
+				y = 1
+
+				gks.linijaDo(x,y)
+				gks.koristiBoju('red')
+				gks.povuciLiniju()
+
 
 			});
 		</script>
