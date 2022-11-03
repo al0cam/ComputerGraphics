@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="hr">
+	<head>
+		<meta charset="UTF-8">
+		<title>Elipsa</title>
+		<script type="text/javascript" src="Ortho.js"></script>
+		<script type="text/javascript" src="MT3D.js"></script>
+		<script type="text/javascript">
+			let ortho;
+			let mt3d;
+
+			window.addEventListener('load', (event) => {
+
+				let platno1 = document.getElementById("slika1");	
+				if(!platno1) alert("Greška - nema platna!");
+				
+				mt3d = new MT3D()
+				ortho = new Ortho(platno1,-2,2,-2,2)
+
+				ortho.koristiBoju("red")
+				mt3d.identitet()
+
+				ortho.trans(mt3d)
+				cube(1)
+
+				// ortho.koristiBoju("red")
+				// mt3d.identitet()
+				// mt3d.rotirajX(30)
+				// ortho.trans(mt3d)
+				// cube(1)
+
+				ortho.koristiBoju("green")
+				mt3d.identitet()
+				mt3d.pomakni(0.5,0.5,0)
+				mt3d.rotirajY(30)
+				ortho.trans(mt3d)
+				cube(1)
+
+				// ortho.koristiBoju("blue")
+				// mt3d.identitet()
+				// mt3d.rotirajZ(30)
+				// ortho.trans(mt3d)
+				// cube(1)
+
+				ortho.koristiBoju("black")
+				mt3d.identitet()
+				mt3d.pomakni(-1.5,0.5,0)
+				mt3d.rotirajZ(30)
+				mt3d.rotirajY(30)
+				mt3d.rotirajX(30)
+				ortho.trans(mt3d)
+				cube(1)
+
+			});
+
+			function cube(a)
+			{
+				ortho.pocniPut()
+
+				ortho.postaviNa(0,0,0)
+				// xy face
+				ortho.linijaDo(a,0,0)
+				ortho.linijaDo(a,a,0)
+				ortho.linijaDo(0,a,0)
+				ortho.linijaDo(0,0,0)
+				// yz face
+				ortho.linijaDo(0,0,a)
+				ortho.linijaDo(0,a,a)
+				ortho.linijaDo(0,a,0)
+
+				// xyz face
+				ortho.postaviNa(0,a,a)
+				ortho.linijaDo(a,a,a)
+				ortho.linijaDo(a,0,a)
+				ortho.linijaDo(0,0,a)
+
+				// ortho.linijaDo(a,a,a)
+
+
+				// xz face
+				ortho.postaviNa(a,0,0)
+				ortho.linijaDo(a,0,a)
+				ortho.linijaDo(a,a,a)
+				ortho.linijaDo(a,a,0)
+				
+				ortho.povuciLiniju()				
+			}
+		</script>
+	</head>
+
+	<body>
+		<h1>Parabola </h1>
+		<div>
+			<canvas id="slika1" width="600" height="500" style="border:5px solid black">
+				Vaš preglednik ne podržava HTML5 canvas.
+			</canvas>
+		</div>
+	</div>
+	</body>
+</html>

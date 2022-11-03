@@ -1,4 +1,4 @@
-class Ortho {
+class GKS {
     w;
     h;
     sX;
@@ -15,7 +15,6 @@ class Ortho {
         this.w = platno.width;
         this.h = platno.height
         this.platno = platno
-        this.g = this.platno.getContext("2d");
 
         if(yMin == null || yMax == null)
         {
@@ -59,6 +58,8 @@ class Ortho {
 
 
     slikajKoordinatniSustav() {
+        this.g = this.platno.getContext("2d");
+
         //pozadina
         this.g.fillStyle = "#FFFFE0";
         this.g.fillRect(0, 0, this.w, this.h);
@@ -148,24 +149,25 @@ class Ortho {
     {
         this.g.beginPath()
     }
-    postaviNa(x,y,z)
+    postaviNa(x,y)
     {
-
-        let xCrta = this.#matrica[0][0]*x + this.#matrica[0][1]*y + this.#matrica[0][2]*z + this.#matrica[0][3]
-        let yCrta = this.#matrica[1][0]*x + this.#matrica[1][1]*y + this.#matrica[1][2]*z + this.#matrica[1][3]
-
-        let xPix = this.originX + xCrta*this.sX
-        let yPix = this.originY - yCrta*this.sY
+        let xPix = this.originX + x*this.sX
+        let yPix = this.originY - y*this.sY
         this.g.moveTo(xPix, yPix);
     }
-    linijaDo(x,y,z)
+    linijaDo(x,y)
     {
-        let xCrta = this.#matrica[0][0]*x + this.#matrica[0][1]*y + this.#matrica[0][2]*z + this.#matrica[0][3]
-        let yCrta = this.#matrica[1][0]*x + this.#matrica[1][1]*y + this.#matrica[1][2]*z + this.#matrica[1][3]
+        let xCrta = this.#matrica[0][0]*x +
+         this.#matrica[0][1]*y + this.#matrica[0][2]
+        let yCrta = this.#matrica[1][0]*x + 
+         this.#matrica[1][1]*y + this.#matrica[1][2]
+
+        // console.log("xCrta:" , xCrta, this.#matrica[0][0]*x , this.#matrica[0][1]*y , this.#matrica[0][2]);
 
         let xPix = this.originX + xCrta*this.sX
         let yPix = this.originY - yCrta*this.sY
         this.g.lineTo(xPix, yPix);
+
     }
     koristiBoju(boja)
     {
@@ -178,10 +180,9 @@ class Ortho {
 
     identitet(){
         this.#matrica = [
-            [1,0,0,0],
-            [0,1,0,0],
-            [0,0,1,0]
-            [0,0,0,1]
+            [1,0,0],
+            [0,1,0],
+            [0,0,1]
         ];
     }
 
