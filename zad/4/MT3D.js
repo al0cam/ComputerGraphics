@@ -208,10 +208,40 @@ class MT3D {
         ];
     }
 
+    velicinaVektora(vektor)
+    {
+        let returnValue = 0;
+        vektor.forEach(element => {
+            returnValue += element**2
+        });
+        return Math.sqrt(returnValue)
+    }
+
+    dijeljenjeVektoraSkalarom(vektor,skalar)
+    {
+        return vektor.map(value => value/skalar)
+    }
+
+    mnozenjeVektoraSkalarom(vektor,skalar)
+    {
+        return vektor.map(value => value*skalar)
+    }
+
     postaviKameru(x0, y0, z0, x1, y1, z1, Vx, Vy, Vz)
     {
-        
-        
+        let N = [x0-x1,y0-y1,z0-z1]
+        let V = [Vx, Vy, Vz]
+        let n = this.dijeljenjeVektoraSkalarom(N,this.velicinaVektora(N))
+        let U = this.vektorskiProdukt(V,n)
+        let u = this.dijeljenjeVektoraSkalarom(U,this.velicinaVektora(U))
+        let v = this.vektorskiProdukt(n,u)
+
+        this.kamera = [
+            [u[0],u[1],u[2],-u[0]*x0 - u[0]*y0 - u[0]*z0],
+            [v[0],v[1],v[2],-v[0]*x0 - v[0]*y0 - v[0]*z0],
+            [n[0],n[1],n[2],-n[0]*x0 - n[0]*y0 - n[0]*z0],
+            [0,0,0,1]
+        ];
     }
 
     vektorskiProdukt(u,v)

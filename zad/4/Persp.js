@@ -1,4 +1,4 @@
-class Ortho {
+class Persp {
     w;
     h;
     sX;
@@ -7,8 +7,9 @@ class Ortho {
 	originY;
     g;
     #matrica = null;
+    d;
 
-    constructor(platno, xMin, xMax, yMin, yMax)
+    constructor(platno, xMin, xMax, yMin, yMax, d)
     {
 		if(!platno) alert("Greška - nema platna!");
 
@@ -44,6 +45,7 @@ class Ortho {
             this.xMax = xMax
             this.yMin = yMin
             this.yMax = yMax
+            this.d = d
 
             this.sX = this.w/(xMax - xMin)
             this.sY = this.h/(yMax - yMin)
@@ -138,12 +140,10 @@ class Ortho {
         this.g.strokeStyle = "black";
         this.g.stroke();
     }
-
     clear()
     {
         this.g.clearRect(0, 0, this.w, this.h);
     }
-
     pocniPut()
     {
         this.g.beginPath()
@@ -153,18 +153,26 @@ class Ortho {
 
         let xCrta = this.#matrica[0][0]*x + this.#matrica[0][1]*y + this.#matrica[0][2]*z + this.#matrica[0][3]
         let yCrta = this.#matrica[1][0]*x + this.#matrica[1][1]*y + this.#matrica[1][2]*z + this.#matrica[1][3]
+        let zCrta = this.#matrica[2][0]*x + this.#matrica[2][1]*y + this.#matrica[2][2]*z + this.#matrica[2][3]
 
-        let xPix = this.originX + xCrta*this.sX
-        let yPix = this.originY - yCrta*this.sY
+        let xp = - (this.d/zCrta)*xCrta
+        let yp = - (this.d/zCrta)*yCrta
+
+        let xPix = this.originX + xp*this.sX
+        let yPix = this.originY + yp*this.sY
         this.g.moveTo(xPix, yPix);
     }
     linijaDo(x,y,z)
     {
         let xCrta = this.#matrica[0][0]*x + this.#matrica[0][1]*y + this.#matrica[0][2]*z + this.#matrica[0][3]
         let yCrta = this.#matrica[1][0]*x + this.#matrica[1][1]*y + this.#matrica[1][2]*z + this.#matrica[1][3]
+        let zCrta = this.#matrica[2][0]*x + this.#matrica[2][1]*y + this.#matrica[2][2]*z + this.#matrica[2][3]
 
-        let xPix = this.originX + xCrta*this.sX
-        let yPix = this.originY - yCrta*this.sY
+        let xp = - (this.d/zCrta)*xCrta
+        let yp = - (this.d/zCrta)*yCrta
+
+        let xPix = this.originX + xp*this.sX
+        let yPix = this.originY + yp*this.sY
         this.g.lineTo(xPix, yPix);
     }
     koristiBoju(boja)
@@ -186,11 +194,11 @@ class Ortho {
     }
 
     trans(mt3d){
-        this.#matrica = mt3d.matrica
-    }
-
-    transKamera(mt3d){
         this.#matrica = mt3d.mnoziMatrice(mt3d.kamera,mt3d.matrica)
     }
+
+    // trans(mt3d){
+    //     this.#matrica = mt3d.mnoziMatrice(mt3d.kamera,mt3d.matrica)
+    // }
 
 }

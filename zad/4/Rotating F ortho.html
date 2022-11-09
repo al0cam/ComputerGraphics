@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="hr">
+	<head>
+		<meta charset="UTF-8">
+		<title>Elipsa</title>
+		<script type="text/javascript" src="Ortho.js"></script>
+		<script type="text/javascript" src="MT3D.js"></script>
+		<script type="text/javascript">
+			let ortho;
+			let mt3d;
+
+			let kameraX = 0;
+			let kameraY = 0;
+			let kameraZ = 0;
+			let sustavX = 0;
+			let sustavY = 0;
+			let sustavZ = 0;
+
+			let korak = 0;
+			let visina = 0;
+
+			window.addEventListener('load', (event) => {
+
+				let platno1 = document.getElementById("slika1");	
+				if(!platno1) alert("Greška - nema platna!");
+				
+				mt3d = new MT3D()
+				ortho = new Ortho(platno1,-10,10,-10,10)
+
+				rotirajuceF()
+			});
+
+			function rotirajuceF()
+			{
+
+				let a = 1
+				ortho.clear()
+				ortho.identitet()
+
+				korak = (korak + 0.01)%(2*Math.PI)
+				visina = (visina + 0.01)%(2*Math.PI)
+
+				kameraX = Math.cos(korak);
+				kameraY = Math.sin(korak);
+
+				kameraZ = Math.sin(visina);
+				
+
+				mt3d.postaviKameru(kameraX,kameraY,kameraZ,sustavX,sustavY,sustavZ,0,0,1)
+				ortho.transKamera(mt3d)
+				tile(a,0,1)
+				floor(a)
+				f(a)
+
+
+
+				requestAnimationFrame(rotirajuceF)
+			}
+
+			function f(a)
+			{
+
+				ortho.koristiBoju("black")
+				mt3d.identitet()
+				ortho.transKamera(mt3d)
+				cube(a)
+
+				mt3d.pomakni(0,0,a)
+				ortho.transKamera(mt3d)
+				cube(a)
+
+				mt3d.pomakni(0,0,a)
+				ortho.transKamera(mt3d)
+				cube(a)
+
+				mt3d.pomakni(0,0,a)
+				ortho.transKamera(mt3d)
+				cube(a)
+
+				mt3d.pomakni(0,0,a)
+				ortho.transKamera(mt3d)
+				cube(a)
+
+				mt3d.identitet()
+				mt3d.pomakni(0,a,2*a)
+				ortho.transKamera(mt3d)
+				cube(a)
+				
+				mt3d.pomakni(0,0,2*a)
+				ortho.transKamera(mt3d)
+				cube(a)
+
+				mt3d.pomakni(0,a,0)
+				ortho.transKamera(mt3d)
+				cube(a)
+
+			}
+
+			function floor(a)
+			{
+				ortho.koristiBoju("green")
+				for(let i = ortho.xMin; i < ortho.xMax;i++)
+				{
+					for(let k = ortho.yMin; k<ortho.yMax;k++)
+					{
+						mt3d.identitet()
+						mt3d.pomakni(i,k,0)
+						ortho.transKamera(mt3d)
+						tile(a)
+					}
+				}
+
+			}
+
+			function tile(a)
+			{
+				ortho.pocniPut()
+				ortho.postaviNa(0,0,0)
+				// xy face
+				ortho.linijaDo(a,0,0)
+				ortho.linijaDo(a,a,0)
+				ortho.linijaDo(0,a,0)
+				ortho.linijaDo(0,0,0)
+
+				ortho.povuciLiniju()
+			}
+
+			function cube(a)
+			{
+				ortho.pocniPut()
+
+				ortho.postaviNa(0,0,0)
+				// xy face
+				ortho.linijaDo(a,0,0)
+				ortho.linijaDo(a,a,0)
+				ortho.linijaDo(0,a,0)
+				ortho.linijaDo(0,0,0)
+				// yz face
+				ortho.linijaDo(0,0,a)
+				ortho.linijaDo(0,a,a)
+				ortho.linijaDo(0,a,0)
+
+				// xyz face
+				ortho.postaviNa(0,a,a)
+				ortho.linijaDo(a,a,a)
+				ortho.linijaDo(a,0,a)
+				ortho.linijaDo(0,0,a)
+
+				// xz face
+				ortho.postaviNa(a,0,0)
+				ortho.linijaDo(a,0,a)
+				ortho.linijaDo(a,a,a)
+				ortho.linijaDo(a,a,0)
+				
+				ortho.povuciLiniju()				
+			}
+		</script>
+	</head>
+
+	<body>
+		<h1>Parabola </h1>
+		<div>
+			<canvas id="slika1" width="1050	" height="1050" style="border:5px solid black">
+				Vaš preglednik ne podržava HTML5 canvas.
+			</canvas>
+		</div>
+	</div>
+	</body>
+</html>
