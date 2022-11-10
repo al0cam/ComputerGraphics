@@ -245,4 +245,88 @@ class Persp {
         this.#matrica = mt3d.mnoziMatrice(mt3d.kamera, mt3d.matrica)
     }
 
+
+    stozac(r,h,n)
+    {
+        this.koristiBoju("black")
+        // this.
+        this.postaviNa(0,0,h)
+        this.pocniPut()
+        for(let i = 0; i < 2*Math.PI;i+=Math.PI/n)
+        {
+
+            this.linijaDo(r*Math.cos(i),r*Math.sin(i),0)
+
+            this.linijaDo(0,0,h)
+            this.postaviNa(r*Math.cos(i),r*Math.sin(i),0)
+            
+        }
+
+        this.povuciLiniju();
+    }
+
+
+
+    valjak(r,h,n)
+    {
+        this.koristiBoju("black")
+        // this.
+        this.postaviNa(0,0,0)
+        this.pocniPut()
+        for(let i = 0; i < 2*Math.PI;i+=Math.PI/n)
+        {
+            this.linijaDo(r*Math.cos(i),r*Math.sin(i),0)
+            this.linijaDo(r*Math.cos(i),r*Math.sin(i),h)
+            this.postaviNa(r*Math.cos(i),r*Math.sin(i),0)
+        }
+        for(let i = 0; i < 2*Math.PI;i+=Math.PI/n)
+        {
+            this.linijaDo(r*Math.cos(i),r*Math.sin(i),h)
+            this.postaviNa(r*Math.cos(i),r*Math.sin(i),h)
+        }
+
+        this.povuciLiniju();
+    }
+
+
+    kugla(r,m,n)
+    {
+        let x;
+        let y;
+        let z;
+
+        this.koristiBoju("black")
+        // this.
+        this.postaviNa(0,0,0)
+        this.pocniPut()
+        for(let theta = 0; theta <= Math.PI; theta+=Math.PI/m)
+        {
+            for(let i = 0; i <= 2*Math.PI;i+=Math.PI/n)
+            {
+                // this.postaviNa(x,y,z)
+                x = r*Math.cos(i)*Math.sin(theta)
+                y = r*Math.sin(i)*Math.sin(theta)
+                z = r*Math.cos(theta)
+
+                this.linijaDo(x,y,z)
+            }
+        }
+        this.postaviNa(0,0,r)
+
+
+        for(let i = 0; i <= 2*Math.PI;i+=Math.PI/n)
+        {
+            this.postaviNa(0,0,r)
+            for(let theta = 0; theta <= Math.PI; theta+=Math.PI/m)
+            {
+            x = r*Math.cos(i)*Math.sin(theta)
+            y = r*Math.sin(i)*Math.sin(theta)
+            z = r*Math.cos(theta)
+
+            this.linijaDo(x,y,z)
+           }
+        }
+
+        this.povuciLiniju();
+    }
 }

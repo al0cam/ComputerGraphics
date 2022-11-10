@@ -25,80 +25,36 @@
 				if(!platno1) alert("Greška - nema platna!");
 				
 				mt3d = new MT3D()
-				persp = new Persp(platno1,-20,20,-20,20,10)
+				persp = new Persp(platno1,-10,10,-10,10,5)
 
-				rotirajuceF()
+				rotirajuciStozac()
 			});
 
-			function rotirajuceF()
+			function rotirajuciStozac()
 			{
 
 				let a = 1
 				persp.clear()
-				persp.identitet()
 
 				korak = (korak + 0.01)%(2*Math.PI)
-				visina = (visina + 0.01)%(2*Math.PI)
+				// visina = (visina + 0.001)%(2*Math.PI)
 
 				kameraX = 5*Math.cos(korak)
 				kameraY = 5*Math.sin(korak)
-				kameraZ = 3+Math.sin(visina);
-				
-				// korak = (korak + 0.01)%(2*Math.PI)
-				// visina = (visina + 0.01)%(2*Math.PI)
-
-				// kameraX = 1
-				// kameraY = 2
-
-				// kameraZ = 2*Math.sin(visina)
-				// kameraZ = 4
-
+				// kameraX = 7
+				// kameraY = 7
+				kameraZ = 5
 
 				mt3d.postaviKameru(kameraX,kameraY,kameraZ,sustavX,sustavY,sustavZ,0,0,-1)
 				persp.trans(mt3d)
+			
+				// mt3d.identitet()
 				floor(a)
-				f(a)
-
-				requestAnimationFrame(rotirajuceF)
-			}
-
-			function f(a)
-			{
-
-				persp.koristiBoju("black")
 				mt3d.identitet()
 				persp.trans(mt3d)
-				cube(a)
-
-				mt3d.pomakni(0,0,a)
-				persp.trans(mt3d)
-				cube(a)
-
-				mt3d.pomakni(0,0,a)
-				persp.trans(mt3d)
-				cube(a)
-
-				mt3d.pomakni(0,0,a)
-				persp.trans(mt3d)
-				cube(a)
-
-				mt3d.pomakni(0,0,a)
-				persp.trans(mt3d)
-				cube(a)
-
-				mt3d.identitet()
-				mt3d.pomakni(0,a,2*a)
-				persp.trans(mt3d)
-				cube(a)
-				
-				mt3d.pomakni(0,0,2*a)
-				persp.trans(mt3d)
-				cube(a)
-
-				mt3d.pomakni(0,a,0)
-				persp.trans(mt3d)
-				cube(a)
-
+				persp.stozac(5,5,12)
+			
+				requestAnimationFrame(rotirajuciStozac)
 			}
 
 			function floor(a)
@@ -114,7 +70,6 @@
 						tile(a)
 					}
 				}
-
 			}
 
 			function tile(a)
@@ -128,36 +83,6 @@
 				persp.linijaDo(0,0,0)
 
 				persp.povuciLiniju()
-			}
-
-			function cube(a)
-			{
-				persp.pocniPut()
-
-				persp.postaviNa(0,0,0)
-				// xy face
-				persp.linijaDo(a,0,0)
-				persp.linijaDo(a,a,0)
-				persp.linijaDo(0,a,0)
-				persp.linijaDo(0,0,0)
-				// yz face
-				persp.linijaDo(0,0,a)
-				persp.linijaDo(0,a,a)
-				persp.linijaDo(0,a,0)
-
-				// xyz face
-				persp.postaviNa(0,a,a)
-				persp.linijaDo(a,a,a)
-				persp.linijaDo(a,0,a)
-				persp.linijaDo(0,0,a)
-
-				// xz face
-				persp.postaviNa(a,0,0)
-				persp.linijaDo(a,0,a)
-				persp.linijaDo(a,a,a)
-				persp.linijaDo(a,a,0)
-				
-				persp.povuciLiniju()				
 			}
 		</script>
 	</head>
