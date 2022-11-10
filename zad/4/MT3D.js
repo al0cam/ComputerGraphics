@@ -166,6 +166,23 @@ class MT3D {
         }
         this.matrica = rezultat;
     }
+    mnoziM(m1,m2){
+        let rezultat = [
+            [0 ,0 ,0, 0],
+            [0 ,0 ,0, 0],
+            [0 ,0 ,0, 0],
+            [0 ,0 ,0, 0]
+        ];
+
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+                for (let k = 0; k < 4; k++) {
+                    rezultat[i][j] += m1[i][k] * m2[k][j];
+                }
+            }
+        }
+        return rezultat;
+    }
 
     /** 
      *  matrice mogu biti razlicitih velicina no
@@ -237,9 +254,9 @@ class MT3D {
         let v = this.vektorskiProdukt(n,u)
 
         this.kamera = [
-            [u[0],u[1],u[2],-u[0]*x0 - u[0]*y0 - u[0]*z0],
-            [v[0],v[1],v[2],-v[0]*x0 - v[0]*y0 - v[0]*z0],
-            [n[0],n[1],n[2],-n[0]*x0 - n[0]*y0 - n[0]*z0],
+            [u[0],u[1],u[2],-u[0]*x0 - u[1]*y0 - u[2]*z0],
+            [v[0],v[1],v[2],-v[0]*x0 - v[1]*y0 - v[2]*z0],
+            [n[0],n[1],n[2],-n[0]*x0 - n[1]*y0 - n[2]*z0],
             [0,0,0,1]
         ];
     }
