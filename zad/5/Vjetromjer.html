@@ -25,36 +25,79 @@
 				if(!platno1) alert("Greška - nema platna!");
 				
 				mt3d = new MT3D()
-				persp = new Persp(platno1,-10,10,-10,10,5)
+				persp = new Persp(platno1,-10,10,-10,10,4)
 
-				rotirajuciStozac()
+				vjetromjer()
 			});
 
-			function rotirajuciStozac()
+			function vjetromjer()
 			{
-
 				let a = 1
 				persp.clear()
 
-				korak = (korak + 0.01)%(2*Math.PI)
+				korak = (korak + 0.6)%360
 				// visina = (visina + 0.001)%(2*Math.PI)
 
-				kameraX = 5*Math.cos(korak)
-				kameraY = 5*Math.sin(korak)
-				// kameraX = 7
-				// kameraY = 7
-				kameraZ = 2
+				// kameraX = 3*Math.cos(korak)
+				// kameraY = 3*Math.sin(korak)
+				// kameraZ = 7
+				kameraX = 3
+				kameraY = 3
+				kameraZ = 7
 
 				mt3d.postaviKameru(kameraX,kameraY,kameraZ,sustavX,sustavY,sustavZ,0,0,-1)
 				persp.trans(mt3d)
 			
 				// mt3d.identitet()
 				floor(a)
+
 				mt3d.identitet()
 				persp.trans(mt3d)
-				persp.kugla(2,10,10)
+				persp.stozac(4,6,10)
+
+
+				mt3d.identitet()
+				mt3d.pomakni(0,0,5)
+				mt3d.rotirajZ(korak)
+				persp.trans(mt3d)
+				persp.valjak(1,1,10)
+
+				krakSPoluKuglom(korak)
+				krakSPoluKuglom(korak+120)
+				krakSPoluKuglom(korak+240)
+
+				// krakSPoluKuglom(korak)
+				// krakSPoluKuglom(korak+(Math.PI*2)/3)
+				// krakSPoluKuglom(korak+(Math.PI*4)/3)
+
 			
-				requestAnimationFrame(rotirajuciStozac)
+				requestAnimationFrame(vjetromjer)
+			}
+
+			function krakSPoluKuglom(kut)
+			{
+				// let x = Math.cos(pomak)
+				// let y = Math.sin(pomak)
+				// let kut = pomak*180/Math.PI
+				let radijani = kut * Math.PI / 180;
+				let x = 4.5*Math.sin(radijani)
+				let y = -4.5*Math.cos(radijani)
+
+				mt3d.identitet()
+				mt3d.pomakni(0,0,5.5)
+				mt3d.rotirajX(90)
+				mt3d.rotirajY(kut)
+				persp.trans(mt3d)
+				persp.valjak(0.2,3.6,10)
+
+				mt3d.identitet()
+				mt3d.pomakni(x,y,5.5)
+				mt3d.rotirajZ(kut+90)
+				
+				persp.trans(mt3d)
+				persp.poluKugla(1,10,10)
+
+
 			}
 
 			function floor(a)

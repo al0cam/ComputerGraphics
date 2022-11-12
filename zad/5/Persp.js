@@ -169,6 +169,7 @@ class Persp {
         if (zCrta < granicaCrtanja && this.#zLast < granicaCrtanja) {
             this.crtaj(xCrta, yCrta, zCrta)
         }
+        else if (zCrta > granicaCrtanja && this.#zLast > granicaCrtanja);
         else if (zCrta < granicaCrtanja && this.#zLast > granicaCrtanja) {
             let t = (this.#zLast + granicaCrtanja) / (this.#zLast - zCrta)
 
@@ -190,13 +191,6 @@ class Persp {
             let x = this.#xLast + (xCrta - this.#xLast) * t
             let y = this.#yLast + (yCrta - this.#yLast) * t
             let z = - granicaCrtanja
-
-            // let xp = - (this.d / this.#zLast) * this.#xLast
-            // let yp = - (this.d / this.#zLast) * this.#yLast
-
-            // let xPix = this.originX + xp * this.sX
-            // let yPix = this.originY + yp * this.sY
-            // this.g.moveTo(xPix, yPix);
             
             this.crtaj(x, y, z)
 
@@ -252,7 +246,7 @@ class Persp {
         // this.
         this.postaviNa(0,0,h)
         this.pocniPut()
-        for(let i = 0; i < 2*Math.PI;i+=Math.PI/n)
+        for(let i = 0; i <= 2*Math.PI;i+=Math.PI/n)
         {
 
             this.linijaDo(r*Math.cos(i),r*Math.sin(i),0)
@@ -273,13 +267,13 @@ class Persp {
         // this.
         this.postaviNa(0,0,0)
         this.pocniPut()
-        for(let i = 0; i < 2*Math.PI;i+=Math.PI/n)
+        for(let i = 0; i <= 2*Math.PI;i+=Math.PI/n)
         {
             this.linijaDo(r*Math.cos(i),r*Math.sin(i),0)
             this.linijaDo(r*Math.cos(i),r*Math.sin(i),h)
             this.postaviNa(r*Math.cos(i),r*Math.sin(i),0)
         }
-        for(let i = 0; i < 2*Math.PI;i+=Math.PI/n)
+        for(let i = 0; i <= 2*Math.PI;i+=Math.PI/n)
         {
             this.linijaDo(r*Math.cos(i),r*Math.sin(i),h)
             this.postaviNa(r*Math.cos(i),r*Math.sin(i),h)
@@ -315,6 +309,52 @@ class Persp {
 
 
         for(let i = 0; i <= 2*Math.PI;i+=Math.PI/n)
+        {
+            this.postaviNa(0,0,r)
+            for(let theta = 0; theta <= Math.PI; theta+=Math.PI/m)
+            {
+            x = r*Math.cos(i)*Math.sin(theta)
+            y = r*Math.sin(i)*Math.sin(theta)
+            z = r*Math.cos(theta)
+
+            this.linijaDo(x,y,z)
+           }
+        }
+
+        this.povuciLiniju();
+    }
+
+    poluKugla(r,m,n)
+    {
+        let x;
+        let y;
+        let z;
+
+        this.koristiBoju("black")
+        // this.
+        this.postaviNa(0,0,0)
+        this.pocniPut()
+        for(let theta = 0; theta <= Math.PI; theta+=Math.PI/m)
+        {
+            x = r*Math.cos(0)*Math.sin(theta)
+            y = r*Math.sin(0)*Math.sin(theta)
+            z = r*Math.cos(theta)
+            this.postaviNa(x,y,z)
+            for(let i = 0; i <= Math.PI;i+=Math.PI/n)
+            {
+
+                // this.postaviNa(x,y,z)
+                x = r*Math.cos(i)*Math.sin(theta)
+                y = r*Math.sin(i)*Math.sin(theta)
+                z = r*Math.cos(theta)
+
+                this.linijaDo(x,y,z)
+            }
+        }
+        this.postaviNa(0,0,r)
+
+
+        for(let i = 0; i <= Math.PI;i+=Math.PI/n)
         {
             this.postaviNa(0,0,r)
             for(let theta = 0; theta <= Math.PI; theta+=Math.PI/m)

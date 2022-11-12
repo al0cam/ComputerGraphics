@@ -329,4 +329,45 @@ class Persp {
 
         this.povuciLiniju();
     }
+
+    poluKugla(r,m,n)
+    {
+        let x;
+        let y;
+        let z;
+
+        this.koristiBoju("black")
+        // this.
+        this.postaviNa(0,0,0)
+        this.pocniPut()
+        for(let theta = 0; theta <= Math.PI; theta+=Math.PI/m)
+        {
+            for(let i = 0; i <= 2*Math.PI;i+=Math.PI/n)
+            {
+                // this.postaviNa(x,y,z)
+                x = r*Math.cos(i)*Math.sin(theta)
+                y = r*Math.sin(i)*Math.sin(theta)
+                z = r*Math.cos(theta)
+
+                this.linijaDo(x,y,z)
+            }
+        }
+        this.postaviNa(0,0,r)
+
+
+        for(let i = 0; i <= 2*Math.PI;i+=Math.PI/n)
+        {
+            this.postaviNa(0,0,r)
+            for(let theta = 0; theta <= Math.PI; theta+=Math.PI/m)
+            {
+            x = r*Math.cos(i)*Math.sin(theta)
+            y = r*Math.sin(i)*Math.sin(theta)
+            z = r*Math.cos(theta)
+
+            this.linijaDo(x,y,z)
+           }
+        }
+
+        this.povuciLiniju();
+    }
 }
