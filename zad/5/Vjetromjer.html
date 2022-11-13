@@ -76,23 +76,21 @@
 
 			function krakSPoluKuglom(kut)
 			{
-				// let x = Math.cos(pomak)
-				// let y = Math.sin(pomak)
-				// let kut = pomak*180/Math.PI
+				
 				let radijani = kut * Math.PI / 180;
-				let x = 4.5*Math.sin(radijani)
+				let x = -4.5*Math.sin(radijani)
 				let y = -4.5*Math.cos(radijani)
 
 				mt3d.identitet()
 				mt3d.pomakni(0,0,5.5)
 				mt3d.rotirajX(90)
-				mt3d.rotirajY(kut)
+				mt3d.rotirajY(-kut)
 				persp.trans(mt3d)
 				persp.valjak(0.2,3.6,10)
 
 				mt3d.identitet()
 				mt3d.pomakni(x,y,5.5)
-				mt3d.rotirajZ(kut+90)
+				mt3d.rotirajZ(-kut+90)
 				
 				persp.trans(mt3d)
 				persp.poluKugla(1,10,10)
