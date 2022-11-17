@@ -25,7 +25,7 @@
 				if(!platno1) alert("Greška - nema platna!");
 				
 				mt3d = new MT3D()
-				persp = new Persp(platno1,-10,10,-10,10,4)
+				persp = new Persp(platno1,-10,10,-10,10,6)
 
 				vjetromjer()
 			});
@@ -41,8 +41,8 @@
 				// kameraX = 3*Math.cos(korak)
 				// kameraY = 3*Math.sin(korak)
 				// kameraZ = 7
-				kameraX = 3
-				kameraY = 3
+				kameraX = 4
+				kameraY = 4
 				kameraZ = 7
 
 				mt3d.postaviKameru(kameraX,kameraY,kameraZ,sustavX,sustavY,sustavZ,0,0,-1)
@@ -51,25 +51,33 @@
 				// mt3d.identitet()
 				floor(a)
 
-				mt3d.identitet()
-				persp.trans(mt3d)
-				persp.stozac(4,6,10)
+
+
+				persp.koristiBoju("red")
 
 
 				mt3d.identitet()
-				mt3d.pomakni(0,0,5)
 				mt3d.rotirajZ(-korak)
 				persp.trans(mt3d)
-				persp.valjak(1,1,10)
+				persp.valjak(0.5,4,5)
 
+				mt3d.identitet()
+				mt3d.pomakni(0,0,4)
+				mt3d.rotirajZ(-korak)
+				persp.trans(mt3d)
+				persp.stozac(0.5,2,5)
+
+				mt3d.identitet()
+				mt3d.pomakni(0,0,6.5)
+				mt3d.rotirajZ(-korak)
+				persp.trans(mt3d)
+				persp.kugla(0.5,7,7)
+
+				persp.koristiBoju("blue");
 				krakSPoluKuglom(korak)
 				krakSPoluKuglom(korak+120)
 				krakSPoluKuglom(korak+240)
-
-				// krakSPoluKuglom(korak)
-				// krakSPoluKuglom(korak+(Math.PI*2)/3)
-				// krakSPoluKuglom(korak+(Math.PI*4)/3)
-
+				
 			
 				requestAnimationFrame(vjetromjer)
 			}
@@ -81,16 +89,27 @@
 				let x = -4.5*Math.sin(radijani)
 				let y = -4.5*Math.cos(radijani)
 
-				mt3d.identitet()
-				mt3d.pomakni(0,0,5.5)
-				mt3d.rotirajX(90)
-				mt3d.rotirajY(-kut)
-				persp.trans(mt3d)
-				persp.valjak(0.2,3.6,10)
+				// mt3d.identitet()
+				// mt3d.pomakni(0,2,2.5)
+				// mt3d.rotirajX(90)
+				// mt3d.rotirajY(-kut)
+				// persp.trans(mt3d)
+				// persp.valjak(0.2,3.6,7)
 
 				mt3d.identitet()
-				mt3d.pomakni(x,y,5.5)
-				mt3d.rotirajZ(-kut+90)
+				mt3d.pomakni(x/1.25,y/1.25,2.5)
+				mt3d.rotirajZ(-kut)
+				mt3d.rotirajX(-90)
+
+				persp.trans(mt3d)
+				persp.valjak(0.2,3.1,7)
+
+
+
+				mt3d.identitet()
+				mt3d.pomakni(x,y,2.5)
+				mt3d.rotirajZ(-kut)
+				mt3d.rotirajX(-90)
 				
 				persp.trans(mt3d)
 				persp.poluKugla(1,10,10)
@@ -100,7 +119,7 @@
 
 			function floor(a)
 			{
-				persp.koristiBoju("green")
+				persp.koristiBoju("black")
 				for(let i = persp.xMin; i < persp.xMax;i++)
 				{
 					for(let k = persp.yMin; k<persp.yMax;k++)
