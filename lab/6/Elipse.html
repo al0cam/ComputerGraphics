@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="hr">
+	<head>
+		<meta charset="UTF-8">
+		<title>RG</title>
+		<script src="RG-WebGL.js"></script>
+		<script>
+			let gl;
+			let GPUprogram1;
+			let platno1;
+		  	window.addEventListener('load', (event) => {
+				platno1 = document.getElementById("slika1");	
+				if(!platno1) alert("Greška - nema platna!");
+				
+				gl = platno1.getContext("webgl2");
+				if (gl === null) {
+					alert("Unable to initialize WebGL. Your browser or machine may not support it.");
+					return;
+				}
+
+				GPUprogram1 = pripremiGPUprogram(gl, "vertex-shader", "fragment-shader");
+        		gl.useProgram(GPUprogram1); // možemo imati više GPU programa
+
+				GPUprogram1.u_mTrans = gl.getUniformLocation(GPUprogram1, "u_mTrans");
+       			GPUprogram1.u_boja = gl.getUniformLocation(GPUprogram1, "u_boja");
+
+
+				let vrhovi = [ 
+					0.0,  0.0,   // sredina
+					-0.5, -0.5,   // lijevi donji vrh
+					0.5, -0.5,   // desni donji vrh
+					0.5,  0.5,   // desni gornji vrh
+					-0.5,  0.5,   // lijevi gornji vrh
+					0.0,  0.0
+				];
+				
+				let vrhoviElipse = []
+				let x;
+				let y;
+				let a = 0.9;
+				let b = 0.2;
+				
+
+				vrhoviElipse.push(0)
+				vrhoviElipse.push(0)
+				for(let i=0; i<=Math.PI*2;i+=0.1)
+				{
+					x = a*Math.cos(i)
+					y = b*Math.sin(i)
+					vrhoviElipse.push(x)
+					vrhoviElipse.push(y)
+
+					vrhoviElipse.push(0)
+					vrhoviElipse.push(0)
+				}
+				x = a*Math.cos(Math.PI*2)
+				y = b*Math.sin(Math.PI*2)
+				vrhoviElipse.push(x)
+				vrhoviElipse.push(y)
+
+				// for(let i=0; i<Math.PI*2;i+=0.1)
+				// {
+				// 	x = a*Math.cos(i)
+				// 	y = b*Math.sin(i)
+				// 	vrhoviElipse.push(
+				// 		{
+				// 			x: x,
+				// 			y: y
+				// 		}
+				// 	)
+				// }
+				// vrhoviElipse.push(
+				// 	{
+				// 		x: 0,
+				// 		y: 0
+				// 	}
+				// )
+				console.log(vrhoviElipse);
+
+				napuniSpremnike(vrhoviElipse);
+        		iscrtaj(vrhoviElipse);
+
+				// napuniSpremnike(vrhovi);
+        		// iscrtaj(vrhovi);
+			});
+		
+
+			function napuniSpremnike(vrhovi) {
+				let spremnikVrhova = gl.createBuffer();
+				gl.bindBuffer(gl.ARRAY_BUFFER, spremnikVrhova);
+				
+				// povezivanje s atribut varijablom a_vrhXY u programu za sjenčanje
+				GPUprogram1.a_vrhXY = gl.getAttribLocation(GPUprogram1, "a_vrhXY");
+				gl.enableVertexAttribArray(GPUprogram1.a_vrhXY);
+				gl.vertexAttribPointer(GPUprogram1.a_vrhXY, 2, gl.FLOAT, false, 0, 0);
+				// punjenje spremnika - podaci koji se šalju na GPU
+				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vrhovi), gl.STATIC_DRAW);
+			} 
+
+			function napuniSpremnikeZaObjekt(vrhovi) {
+				let spremnikVrhova = gl.createBuffer();
+				gl.bindBuffer(gl.ARRAY_BUFFER, spremnikVrhova);
+				
+				// povezivanje s atribut varijablom a_vrhXY u programu za sjenčanje
+				GPUprogram1.a_vrhXY = gl.getAttribLocation(GPUprogram1, "a_vrhXY");
+				gl.enableVertexAttribArray(GPUprogram1.a_vrhXY);
+				gl.vertexAttribPointer(GPUprogram1.a_vrhXY, 2, gl.FLOAT, false, 0, 0);
+				// punjenje spremnika - podaci koji se šalju na GPU
+				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vrhovi), gl.STATIC_DRAW);
+			} 
+
+			function iscrtaj(vrhovi) {
+				gl.clearColor(0.4, 0.4, 0.4, 1);
+				gl.clear(gl.COLOR_BUFFER_BIT);
+				gl.viewport(0, 0, platno1.width, platno1.height);
+
+				// postavljanje vrijednosti uniform varijabli
+				gl.uniformMatrix2fv(GPUprogram1.u_mTrans, false,[1.0, 0.0, 0.0, 1.0]); // jedinična matrica
+				gl.uniform4fv(GPUprogram1.u_boja, [0.0, 1.0, 0.0, 1.0]); // zelena boja
+				gl.drawArrays(gl.TRIANGLE_STRIP, 0, vrhovi.length / 2);
+				
+				let kut = Math.PI / 6.0; // 30 stupnjeva
+				gl.uniformMatrix2fv(GPUprogram1.u_mTrans, false,
+					[Math.cos(kut), Math.sin(kut), -Math.sin(kut), Math.cos(kut)]);
+				gl.uniform4fv(GPUprogram1.u_boja, [1.0, 1.0, 0.0, 1.0]); // žuta boja
+				gl.drawArrays(gl.TRIANGLE_STRIP, 0, vrhovi.length / 2);
+
+				kut = Math.PI / 3.0;  // 60 stupnjeva
+				gl.uniformMatrix2fv(GPUprogram1.u_mTrans, false,
+					[Math.cos(kut), Math.sin(kut), -Math.sin(kut), Math.cos(kut)]);
+				gl.uniform4fv(GPUprogram1.u_boja, [1.0, 0.0, 0.0, 1.0]); // crvena boja
+				gl.drawArrays(gl.TRIANGLE_STRIP, 0, vrhovi.length / 2);
+        	} 
+
+		</script>
+
+
+		<script id="vertex-shader" type="x-shader/x-vertex">
+			#version 300 es
+			in vec2 a_vrhXY;
+			uniform mat2 u_mTrans;
+
+			void main() {
+				gl_Position = vec4(u_mTrans * a_vrhXY, 0, 1); // primijeni matricu transformacije
+			}
+		</script>
+
+		<script id="fragment-shader" type="x-shader/x-fragment">
+			#version 300 es
+			precision mediump float;
+			uniform vec4 u_boja;
+			out vec4 bojaPiksela;
+
+			void main() {
+				bojaPiksela = u_boja;
+			}
+		</script>
+	</head>
+
+	<body>
+		<div>
+			<canvas id="slika1" width="500" height="500" style="border:5px solid black">
+				Vaš preglednik ne podržava HTML5 canvas.
+			</canvas>
+		</div>
+	</div>
+	</body>
+</html>
