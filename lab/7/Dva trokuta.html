@@ -48,6 +48,8 @@
       gl.useProgram(GPUprogram1); 
 
       GPUprogram1.u_mTrans = gl.getUniformLocation(GPUprogram1, "u_mTrans");
+      gl.enable(gl.DEPTH_TEST);
+      gl.enable(gl.BACK);
 
       mt3d = new MT3D();
 
@@ -91,10 +93,10 @@
 
     function iscrtaj() {
       gl.clearColor(0.5, 0.5, 0.5, 1);
-      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       gl.viewport(0, 0, platno1.width, platno1.height);
 
-      korak = korak%(360)+0.5;
+      korak = korak%(360)+0.1;
       mt3d.identitet()
       mt3d.rotirajY(korak)
       mt3d.rotirajX(2*korak)

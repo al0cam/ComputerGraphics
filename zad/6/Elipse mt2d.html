@@ -114,7 +114,7 @@
 				mt2d.projekcija2D(-1,1,-1,1)
 				mt2d.rotiraj(30)
 				let kut = Math.PI / 6.0; // 30 stupnjeva
-				gl.uniformMatrix3fv(GPUprogram1.u_mTrans, true,mt2d.lista())
+				gl.uniformMatrix3fv(GPUprogram1.u_mTrans, false,mt2d.lista())
 				gl.uniform4fv(GPUprogram1.u_boja, [1.0, 1.0, 0.0, 1.0]); 
 				gl.drawArrays(gl.TRIANGLE_STRIP, 0, vrhovi.length / 3);
 
@@ -122,7 +122,7 @@
 				mt2d.projekcija2D(-1,1,-1,1)
 				mt2d.rotiraj(60)
 				kut = Math.PI / 3.0;  // 60 stupnjeva
-				gl.uniformMatrix3fv(GPUprogram1.u_mTrans, true,mt2d.lista())
+				gl.uniformMatrix3fv(GPUprogram1.u_mTrans, false,mt2d.lista())
 				gl.uniform4fv(GPUprogram1.u_boja, [1.0, 0.0, 0.0, 1.0]); // crvena boja
 				gl.drawArrays(gl.TRIANGLE_STRIP, 0, vrhovi.length / 3);
         	} 

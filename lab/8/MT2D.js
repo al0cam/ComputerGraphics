@@ -103,7 +103,6 @@ class MT2D {
         {
             lista.push(this.matrica[j][i])
         }
-        
         return lista;
     }
 
