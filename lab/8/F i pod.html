@@ -40,8 +40,8 @@
     let mt3d;
     let korak = 0;
     let a;
-    let xMax =  yMax = 1, zMax = 1;
-    let xMin = yMin = -1, zMin = -1;
+    let xMax = yMax = 6, zMax = 5;
+    let xMin = yMin = -6, zMin = -1;
     window.addEventListener('load', (event) => {
       platno1 = document.getElementById("slika1");
       gl = platno1.getContext("webgl2");
@@ -58,9 +58,8 @@
       mt3d = new MT3D();
 
       a = 0.5;
-   
-      crtajKocku();
-      crtajPod();
+      
+      crtajSliku();
     });
 
     function napuniSpremnike(vrhovi) {
@@ -80,23 +79,33 @@
     } 
 
     function iscrtaj(VAO, vrhovi, vrstaCrte) {
-      gl.clearColor(0.5, 0.5, 0.5, 1);
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       gl.viewport(0, 0, platno1.width, platno1.height);
 
-      console.log(mt3d.lista());
       gl.uniformMatrix4fv(GPUprogram1.u_mTrans, false, mt3d.lista())
 
       gl.bindVertexArray(VAO);
       gl.drawArrays(vrstaCrte, 0, vrhovi.length);
     } 
 
+    function crtajSliku()
+    {
+      gl.clearColor(0.5, 0.5, 0.5, 1);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      korka = 0.1;
+      let xMin = Math.cos(xMin%(Math.PI*2)+korak)
+      let yMin = Math.sin(yMin%(Math.PI*2)+korak)
+
+      mt3d.identitet()
+      mt3d.ortho(xMin, xMax, yMin, yMax, zMin, zMax)
+      crtajKocku();
+      crtajPod();
+      // requestAnimationFrame(crtajSliku())
+    }
+
     function crtajKocku()
     {
       let vrhovi = kocka()
       let kockaVAO = napuniSpremnike(vrhovi);
-      mt3d.identitet()
-      mt3d.ortho(xMin, xMax, yMin, yMax, zMin, zMax)
       iscrtaj(kockaVAO, vrhovi, gl.TRIANGLES)
     }
 
@@ -113,10 +122,8 @@
 				{
 					for(let k = yMin; k < yMax;k++)
 					{
-						mt3d.identitet()
-						mt3d.pomakni(i,k,0)
-						mt3d.ortho(xMin, xMax, yMin, yMax, zMin, zMax)
-            iscrtaj(tileVAO, vrhovi, gl.LINE)
+						mt3d.pomakni(i+a,-a,k)
+            iscrtaj(tileVAO, vrhovi, gl.LINE_LOOP)
 					}
 				}
 			}
