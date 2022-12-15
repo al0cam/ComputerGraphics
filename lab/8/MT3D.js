@@ -287,10 +287,12 @@ class MT3D {
         let tY = (yMin+yMax)/(yMin - yMax)
         let tZ = (zMin+zMax)/(zMin - zMax)
 
-        console.log(`TRANSLACIJA X: ${tX} xMin: ${xMin} xMax: ${xMax}  yMin: ${yMin}  yMax: ${yMax}`);
-        console.log(`TRANSLACIJA X: ${tX} xMin: ${xMin} xMax: ${xMax}  yMin: ${yMin}  yMax: ${yMax}`);
-
         this.pomakni(tX,tY,tZ)
         this.skaliraj(sX,sY,sZ)
+    }
+
+
+    transKamera(){
+        this.matrica = this.mnoziMatrice(this.kamera,this.matrica)
     }
 }

@@ -39,9 +39,11 @@
     let platno1;
     let mt3d;
     let korak = 0;
-    let a;
-    let xMax = yMax = 6, zMax = 5;
-    let xMin = yMin = -6, zMin = -1;
+    let a = 1;
+    let brid = a/2
+    let xMax = yMax = 5, zMax = 5;
+    let xMin = yMin = -5, zMin = -5;
+
     window.addEventListener('load', (event) => {
       platno1 = document.getElementById("slika1");
       gl = platno1.getContext("webgl2");
@@ -57,33 +59,35 @@
 
       mt3d = new MT3D();
 
-      a = 0.5;
-      
+      GPUprogram1.kockaVAO = napuniSpremnike(kocka());
+      GPUprogram1.tileVAO = napuniSpremnike(tileY());
+      GPUprogram1.floorVAO = napuniSpremnike(floor());
+
       crtajSliku();
     });
 
     function napuniSpremnike(vrhovi) {
-        // povezivanje s atribut varijablama u programu za sjenčanje
       GPUprogram1.a_vrhXY = gl.getAttribLocation(GPUprogram1, "a_vrhXY");
       GPUprogram1.a_boja = gl.getAttribLocation(GPUprogram1, "a_boja");
       
       VAO = gl.createVertexArray();
       gl.bindVertexArray(VAO);
       gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+
       gl.enableVertexAttribArray(GPUprogram1.a_vrhXY);
-      gl.enableVertexAttribArray(GPUprogram1.a_boja);
       gl.vertexAttribPointer(GPUprogram1.a_vrhXY, 3, gl.FLOAT, false, 24, 0);
+
+      gl.enableVertexAttribArray(GPUprogram1.a_boja);
       gl.vertexAttribPointer(GPUprogram1.a_boja, 3, gl.FLOAT, false, 24, 12);
+      
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vrhovi.flat()), gl.STATIC_DRAW);
       return VAO;
     } 
 
-    function iscrtaj(VAO, vrhovi, vrstaCrte) {
+    function iscrtaj(vrhovi, vrstaCrte, VAO) {
       gl.viewport(0, 0, platno1.width, platno1.height);
-
-      gl.uniformMatrix4fv(GPUprogram1.u_mTrans, false, mt3d.lista())
-
       gl.bindVertexArray(VAO);
+      gl.uniformMatrix4fv(GPUprogram1.u_mTrans, false, mt3d.lista())
       gl.drawArrays(vrstaCrte, 0, vrhovi.length);
     } 
 
@@ -91,60 +95,82 @@
     {
       gl.clearColor(0.5, 0.5, 0.5, 1);
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-      korka = 0.1;
-      let xMin = Math.cos(xMin%(Math.PI*2)+korak)
-      let yMin = Math.sin(yMin%(Math.PI*2)+korak)
-
+      korak = korak%(360)+0.1;
       mt3d.identitet()
+      mt3d.rotirajY(korak)
+      mt3d.rotirajX(2*korak)
+      mt3d.rotirajZ(3*korak)
+
       mt3d.ortho(xMin, xMax, yMin, yMax, zMin, zMax)
-      crtajKocku();
-      crtajPod();
-      // requestAnimationFrame(crtajSliku())
+
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+      iscrtaj(floor(), gl.LINE_LOOP, GPUprogram1.floorVAO)
+
+      requestAnimationFrame(crtajSliku)
     }
 
-    function crtajKocku()
+
+    function floor()
+    { 
+      GPUprogram1.floor = []
+      
+      if(GPUprogram1.floor.length == 0)
+      {
+        for(let i = zMin; i <= zMax; i++)
+        {
+          GPUprogram1.floor.push(
+            [xMin, -brid, i, 0, 1, 0],
+            [xMax, -brid, i, 0, 1, 0],
+            [xMin, -brid, i, 0, 1, 0],
+          )
+        }
+        for(let i = xMin; i <= xMax; i++)
+        {
+          GPUprogram1.floor.push(
+            [i, -brid, zMin, 0, 1, 0],
+            [i, -brid, zMax, 0, 1, 0],
+            [i, -brid, zMin, 0, 1, 0],
+          )
+        }
+      }
+      return GPUprogram1.floor;
+    }
+
+
+    function floorUnoptimized(vrhoviTile, korak)
     {
-      let vrhovi = kocka()
-      let kockaVAO = napuniSpremnike(vrhovi);
-      iscrtaj(kockaVAO, vrhovi, gl.TRIANGLES)
+      for(let i = xMin; i <= xMax; i++)
+        for(let k = yMin; k <= yMax; k++)
+        {
+          mt3d.identitet()
+          mt3d.rotirajY(korak)
+          mt3d.rotirajX(2*korak)
+          mt3d.rotirajZ(3*korak)
+          mt3d.ortho(xMin, xMax, yMin, yMax, zMin, zMax)
+          mt3d.pomakni(i,k,-brid)
+          iscrtaj(vrhoviTile, gl.LINE_LOOP, GPUprogram1.tileVAO)
+        }
     }
-
-    function crtajPod()
-    {
-      let vrhovi = tile()
-      let tileVAO = napuniSpremnike(vrhovi);
-      floor(tileVAO, vrhovi)
-    }
-
-    function floor(tileVAO, vrhovi)
-			{
-				for(let i = xMin; i < xMax;i++)
-				{
-					for(let k = yMin; k < yMax;k++)
-					{
-						mt3d.pomakni(i+a,-a,k)
-            iscrtaj(tileVAO, vrhovi, gl.LINE_LOOP)
-					}
-				}
-			}
 
     function tile()
     {
       return [
-        [-a,0,a, 0,1,0],
-        [a,0,a, 0,1,0],
-        [a,0,-a, 0,1,0],
-        [-a,0,-a, 0,1,0],
+        [-brid,0,brid, 0,1,0],
+        [brid,0,brid, 0,1,0],
+        [brid,0,-brid, 0,1,0],
+        [-brid,0,-brid, 0,1,0],
+        [-brid,0,brid, 0,1,0],
       ]
     }
 
     function tileY()
     {
       return [
-        [-a,a,0, 0,1,0],
-        [a,a,0, 0,1,0],
-        [a,-a,0, 0,1,0],
-        [-a,-a,0, 0,1,0],
+        [-brid,brid,0, 0,1,0],
+        [brid,brid,0, 0,1,0],
+        [brid,-brid,0, 0,1,0],
+        [-brid,-brid,0, 0,1,0],
+        [-brid,brid,0, 0,1,0],
       ]
     }
 
@@ -152,58 +178,58 @@
     {
       return [
         // front
-        [-a, a, -a,  0, 1, 0],
-        [-a, -a, -a,  0, 1, 0],
-        [a, -a, -a,  0, 1, 0],
+        [-brid, brid, -brid,  0, 1, 0],
+        [-brid, -brid, -brid,  0, 1, 0],
+        [brid, -brid, -brid,  0, 1, 0],
 
-        [a, -a, -a,  0, 1, 0],
-        [a, a, -a,  0, 1, 0],
-        [-a, a, -a,  0, 1, 0],
+        [brid, -brid, -brid,  0, 1, 0],
+        [brid, brid, -brid,  0, 1, 0],
+        [-brid, brid, -brid,  0, 1, 0],
       
         // left
-        [-a, a, -a,  1, 0, 0],
-        [-a, a, a,  1, 0, 0],
-        [-a, -a, a,  1, 0, 0],
+        [-brid, brid, -brid,  1, 0, 0],
+        [-brid, brid, brid,  1, 0, 0],
+        [-brid, -brid, brid,  1, 0, 0],
 
-        [-a, -a, a,  1, 0, 0],
-        [-a, -a, -a,  1, 0, 0],
-        [-a, a, -a,  1, 0, 0],
+        [-brid, -brid, brid,  1, 0, 0],
+        [-brid, -brid, -brid,  1, 0, 0],
+        [-brid, brid, -brid,  1, 0, 0],
 
         // bot
-        [-a, -a, -a,  0, 0, 0],
-        [-a, -a, a,  0, 0, 0],
-        [a, -a, a,  0, 0, 0],
+        [-brid, -brid, -brid,  0, 0, 0],
+        [-brid, -brid, brid,  0, 0, 0],
+        [brid, -brid, brid,  0, 0, 0],
         
-        [a, -a, a,  0, 0, 0],
-        [a, -a, -a,  0, 0, 0],
-        [-a, -a, -a,  0, 0, 0],
+        [brid, -brid, brid,  0, 0, 0],
+        [brid, -brid, -brid,  0, 0, 0],
+        [-brid, -brid, -brid,  0, 0, 0],
 
         // right
-        [a, -a, -a,  0, 0, 1],
-        [a, -a, a,  0, 0, 1],
-        [a, a, a,  0, 0, 1],
+        [brid, -brid, -brid,  0, 0, 1],
+        [brid, -brid, brid,  0, 0, 1],
+        [brid, brid, brid,  0, 0, 1],
 
-        [a, a, a,  0, 0, 1],
-        [a, a, -a,  0, 0, 1],
-        [a, -a, -a,  0, 0, 1],
+        [brid, brid, brid,  0, 0, 1],
+        [brid, brid, -brid,  0, 0, 1],
+        [brid, -brid, -brid,  0, 0, 1],
 
-        // back
-        [a, -a, a,  1, 1, 1],
-        [-a, -a, a,  1, 1, 1],
-        [-a, a, a,  1, 1, 1],
+        // bbridck
+        [brid, -brid, brid,  1, 1, 1],
+        [-brid, -brid, brid,  1, 1, 1],
+        [-brid, brid, brid,  1, 1, 1],
         
-        [-a, a, a,  1, 1, 1],
-        [a, a, a,  1, 1, 1],
-        [a, -a, a,  1, 1, 1],
+        [-brid, brid, brid,  1, 1, 1],
+        [brid, brid, brid,  1, 1, 1],
+        [brid, -brid, brid,  1, 1, 1],
 
         // top
-        [a, a, a,  0, 1, 1],
-        [-a, a, a,  0, 1, 1],
-        [-a, a, -a,  0, 1, 1],
+        [brid, brid, brid,  0, 1, 1],
+        [-brid, brid, brid,  0, 1, 1],
+        [-brid, brid, -brid,  0, 1, 1],
 
-        [-a, a, -a,  0, 1, 1],
-        [a, a, -a,  0, 1, 1],
-        [a, a, a,  0, 1, 1],
+        [-brid, brid, -brid,  0, 1, 1],
+        [brid, brid, -brid,  0, 1, 1],
+        [brid, brid, brid,  0, 1, 1],
       ];
     }
 	</script>
