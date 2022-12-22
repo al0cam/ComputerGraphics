@@ -54,7 +54,7 @@
       gl.useProgram(GPUprogram1); 
 
       GPUprogram1.u_mTrans = gl.getUniformLocation(GPUprogram1, "u_mTrans");
-      gl.enable(gl.DEPTH_TEST);
+      // gl.enable(gl.DEPTH_TEST);
       gl.enable(gl.CULL_FACE);
       gl.enable(gl.BACK);
 
@@ -100,17 +100,17 @@
 
       korak = (korak + 0.01)%(2*Math.PI)
 
-      let kameraX = 5*Math.sin(korak)
-      let kameraY = 5*Math.cos(korak)
-      let  kameraZ = 7
+      let kameraX = 10*Math.sin(korak)
+      let kameraY = 10*Math.cos(korak)
+      let  kameraZ = 2
       
 
       mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,-1)
       mt3d.transKamera();
       mt3d.persp(xMin, xMax, yMin, yMax, zMin, zMax)
 
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
       iscrtaj(floorY(), gl.LINE_LOOP, GPUprogram1.floorVAO)
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
 
       requestAnimationFrame(crtajSliku)
     }
@@ -246,57 +246,57 @@
       return [
         // front
         [-brid, brid, -brid,  0, 1, 0],
-        [-brid, -brid, -brid,  0, 1, 0],
         [brid, -brid, -brid,  0, 1, 0],
+        [-brid, -brid, -brid,  0, 1, 0],
 
         [brid, -brid, -brid,  0, 1, 0],
-        [brid, brid, -brid,  0, 1, 0],
         [-brid, brid, -brid,  0, 1, 0],
+        [brid, brid, -brid,  0, 1, 0],
       
         // left
         [-brid, brid, -brid,  1, 0, 0],
-        [-brid, brid, brid,  1, 0, 0],
         [-brid, -brid, brid,  1, 0, 0],
+        [-brid, brid, brid,  1, 0, 0],
 
         [-brid, -brid, brid,  1, 0, 0],
-        [-brid, -brid, -brid,  1, 0, 0],
         [-brid, brid, -brid,  1, 0, 0],
+        [-brid, -brid, -brid,  1, 0, 0],
 
         // bot
         [-brid, -brid, -brid,  0, 0, 0],
-        [-brid, -brid, brid,  0, 0, 0],
         [brid, -brid, brid,  0, 0, 0],
+        [-brid, -brid, brid,  0, 0, 0],
         
         [brid, -brid, brid,  0, 0, 0],
-        [brid, -brid, -brid,  0, 0, 0],
         [-brid, -brid, -brid,  0, 0, 0],
+        [brid, -brid, -brid,  0, 0, 0],
 
         // right
         [brid, -brid, -brid,  0, 0, 1],
+        [brid, brid, brid,  0, 0, 1],
         [brid, -brid, brid,  0, 0, 1],
-        [brid, brid, brid,  0, 0, 1],
 
         [brid, brid, brid,  0, 0, 1],
-        [brid, brid, -brid,  0, 0, 1],
         [brid, -brid, -brid,  0, 0, 1],
+        [brid, brid, -brid,  0, 0, 1],
 
-        // bbridck
+        // back
         [brid, -brid, brid,  1, 1, 1],
-        [-brid, -brid, brid,  1, 1, 1],
         [-brid, brid, brid,  1, 1, 1],
+        [-brid, -brid, brid,  1, 1, 1],
         
         [-brid, brid, brid,  1, 1, 1],
-        [brid, brid, brid,  1, 1, 1],
         [brid, -brid, brid,  1, 1, 1],
+        [brid, brid, brid,  1, 1, 1],
 
         // top
         [brid, brid, brid,  1, 0, 1],
-        [-brid, brid, brid,  1, 0, 1],
         [-brid, brid, -brid,  1, 0, 1],
+        [-brid, brid, brid,  1, 0, 1],
 
         [-brid, brid, -brid,  1, 0, 1],
-        [brid, brid, -brid,  1, 0, 1],
         [brid, brid, brid,  1, 0, 1],
+        [brid, brid, -brid,  1, 0, 1],
       ];
     }
 	</script>

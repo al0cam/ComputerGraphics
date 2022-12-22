@@ -54,14 +54,14 @@
       gl.useProgram(GPUprogram1); 
 
       GPUprogram1.u_mTrans = gl.getUniformLocation(GPUprogram1, "u_mTrans");
-      gl.enable(gl.DEPTH_TEST);
+      // gl.enable(gl.DEPTH_TEST);
       gl.enable(gl.CULL_FACE);
       gl.enable(gl.BACK);
 
       mt3d = new MT3D();
 
-      GPUprogram1.kockaVAO = napuniSpremnike(kocka());
       GPUprogram1.floorVAO = napuniSpremnike(floorY());
+      GPUprogram1.kockaVAO = napuniSpremnike(kocka());
 
       crtajSliku();
     });
@@ -100,17 +100,18 @@
 
       korak = (korak + 0.01)%(2*Math.PI)
 
-      let kameraX = Math.cos(korak)/5;
-      let kameraY = Math.sin(korak)/5;
-      let  kameraZ = Math.sin(korak)/3;
+      let kameraX = Math.cos(korak)/6;
+      let kameraY = Math.sin(korak)/6;
+      let  kameraZ = 1;
+      // let  kameraZ = Math.sin(korak)/3;
       
 
-      mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,-1)
+      mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
       mt3d.transKamera();
       mt3d.ortho(xMin, xMax, yMin, yMax, zMin, zMax)
 
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
       iscrtaj(floorY(), gl.LINE_LOOP, GPUprogram1.floorVAO)
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
 
       requestAnimationFrame(crtajSliku)
     }
