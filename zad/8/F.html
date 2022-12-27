@@ -54,14 +54,15 @@
       gl.useProgram(GPUprogram1); 
 
       GPUprogram1.u_mTrans = gl.getUniformLocation(GPUprogram1, "u_mTrans");
-      gl.enable(gl.DEPTH_TEST);
+      // gl.enable(gl.DEPTH_TEST);
       gl.enable(gl.CULL_FACE);
-      gl.enable(gl.BACK);
+      gl.cullFace(gl.BACK);
+      // gl.enable(gl.FRONT);
 
       mt3d = new MT3D();
 
-      GPUprogram1.floorVAO = napuniSpremnike(floorYMaxMin());
       GPUprogram1.kockaVAO = napuniSpremnike(kocka());
+      GPUprogram1.floorVAO = napuniSpremnike(floorY());
 
       crtajSliku();
     });
@@ -100,48 +101,19 @@
 
       korak = (korak + 0.01)%(2*Math.PI)
 
-      let kameraX = Math.cos(korak)/1;
-      let kameraY = Math.sin(korak)/1;
-      // let  kameraZ = 1;
-      let  kameraZ = Math.sin(korak)/3;
+      let kameraX = 10*Math.sin(korak)
+      let kameraY = 10*Math.cos(korak)
+      let  kameraZ = 2
       
 
-      mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
+      mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,-1)
       mt3d.transKamera();
-      mt3d.ortho(xMin, xMax, yMin, yMax, zMin, zMax)
+      mt3d.persp(xMin, xMax, yMin, yMax, zMin, zMax)
 
-      iscrtaj(floorYMaxMin(), gl.LINE_STRIP, GPUprogram1.floorVAO)
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+      iscrtaj(floorY(), gl.LINE_LOOP, GPUprogram1.floorVAO)
+      f()
 
       requestAnimationFrame(crtajSliku)
-    }
-
-    function floorYMaxMin()
-    { 
-      GPUprogram1.floor = []
-      
-      if(GPUprogram1.floor.length == 0)
-      {
-        
-        for(let i = yMax; i >= yMin; i--)
-        {
-          GPUprogram1.floor.push(
-            [xMax, i, -brid, 0, 1, 0],
-            [xMin, i, -brid, 0, 1, 0],
-            [xMax, i, -brid, 0, 1, 0],
-          )
-        }
-        for(let i = xMax; i >= xMin; i--)
-        {
-          GPUprogram1.floor.push(
-            [i, yMax, -brid, 0, 1, 0],
-            [i, yMin, -brid, 0, 1, 0],
-            [i, yMax, -brid, 0, 1, 0],
-          )
-        }
-        
-      }
-      return GPUprogram1.floor;
     }
 
 
@@ -151,7 +123,7 @@
       
       if(GPUprogram1.floor.length == 0)
       {
-        for(let i = yMax; i >= yMin; i--)
+        for(let i = yMin; i <= yMax; i++)
         {
           GPUprogram1.floor.push(
             [xMin, i, -brid, 0, 1, 0],
@@ -159,7 +131,7 @@
             [xMin, i, -brid, 0, 1, 0],
           )
         }
-        for(let i = xMax; i >= xMin; i--)
+        for(let i = xMin; i <= xMax; i++)
         {
           GPUprogram1.floor.push(
             [i, yMin, -brid, 0, 1, 0],
@@ -169,7 +141,6 @@
         }
       }
       return GPUprogram1.floor;
-      // let kameraY = 1;
     }
 
     function floor()
@@ -191,11 +162,54 @@
           GPUprogram1.floor.push(
             [i, -brid, zMin, 0, 1, 0],
             [i, -brid, zMax, 0, 1, 0],
-            [i, -brid, zMin, 0, 1, 0]
+            [i, -brid, zMin, 0, 1, 0],
           )
         }
       }
       return GPUprogram1.floor;
+    }
+
+    function f()
+    {
+      // columnt start
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+
+      mt3d.pomakni(0,0,a)
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+
+      mt3d.pomakni(0,0,a)
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+
+      mt3d.pomakni(0,a,0)
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+
+      mt3d.pomakni(0,-a,a)
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+      // columnt end
+
+      // top row start
+      mt3d.pomakni(0,0,a)
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+      // top row end
+
+      // bottom row start
+      mt3d.pomakni(0,a,0)
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+      // bottom row end
+      
+      // columnt start
+      mt3d.pomakni(0,a,-a)
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+
+      mt3d.pomakni(0,0,-a*2)
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+
+      mt3d.pomakni(0,0,-a)
+      mt3d.pomakni(0,-a,0)
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+
+
+
     }
 
     function kocka()

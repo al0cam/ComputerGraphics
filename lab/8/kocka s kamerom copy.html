@@ -42,8 +42,8 @@
     let visina = 0;
     let a = 1;
     let brid = a/2
-    let xMax = yMax = 5, zMax = 5;
-    let xMin = yMin = -5, zMin = -5;
+    let xMax = yMax = 5, zMax = 1;
+    let xMin = yMin = -5, zMin = -7;
 
     window.addEventListener('load', (event) => {
       platno1 = document.getElementById("slika1");
@@ -60,7 +60,7 @@
 
       mt3d = new MT3D();
 
-      GPUprogram1.floorVAO = napuniSpremnike(floorYMaxMin());
+      GPUprogram1.floorVAO = napuniSpremnike(floorY());
       GPUprogram1.kockaVAO = napuniSpremnike(kocka());
 
       crtajSliku();
@@ -95,55 +95,29 @@
     {
       gl.clearColor(0.5, 0.5, 0.5, 1);
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-      // korak = korak%(360)+0.01;
       mt3d.identitet()
 
       korak = (korak + 0.01)%(2*Math.PI)
 
-      let kameraX = Math.cos(korak)/1;
-      let kameraY = Math.sin(korak)/1;
+      let kameraX = 5*Math.cos(korak);
+      let kameraY = 5*Math.sin(korak);
       // let  kameraZ = 1;
-      let  kameraZ = Math.sin(korak)/3;
+      let  kameraZ = Math.sin(korak);
       
 
       mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
       mt3d.transKamera();
-      mt3d.ortho(xMin, xMax, yMin, yMax, zMin, zMax)
+      mt3d.persp(xMin, xMax, yMin, yMax, zMin, zMax)
 
-      iscrtaj(floorYMaxMin(), gl.LINE_STRIP, GPUprogram1.floorVAO)
+      mt3d.rotirajY(90)
+      iscrtaj(floorY(), gl.LINE_STRIP, GPUprogram1.floorVAO)
+      // mt3d.rotirajZ(180)
+
+      mt3d.pomakni(0,0,0)
       iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
 
       requestAnimationFrame(crtajSliku)
     }
-
-    function floorYMaxMin()
-    { 
-      GPUprogram1.floor = []
-      
-      if(GPUprogram1.floor.length == 0)
-      {
-        
-        for(let i = yMax; i >= yMin; i--)
-        {
-          GPUprogram1.floor.push(
-            [xMax, i, -brid, 0, 1, 0],
-            [xMin, i, -brid, 0, 1, 0],
-            [xMax, i, -brid, 0, 1, 0],
-          )
-        }
-        for(let i = xMax; i >= xMin; i--)
-        {
-          GPUprogram1.floor.push(
-            [i, yMax, -brid, 0, 1, 0],
-            [i, yMin, -brid, 0, 1, 0],
-            [i, yMax, -brid, 0, 1, 0],
-          )
-        }
-        
-      }
-      return GPUprogram1.floor;
-    }
-
 
     function floorY()
     { 
@@ -169,7 +143,6 @@
         }
       }
       return GPUprogram1.floor;
-      // let kameraY = 1;
     }
 
     function floor()
@@ -205,7 +178,7 @@
         [-brid, brid, -brid,  0, 1, 0],
         [brid, -brid, -brid,  0, 1, 0],
         [-brid, -brid, -brid,  0, 1, 0],
-
+        
         [brid, -brid, -brid,  0, 1, 0],
         [-brid, brid, -brid,  0, 1, 0],
         [brid, brid, -brid,  0, 1, 0],

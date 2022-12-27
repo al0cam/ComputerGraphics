@@ -277,7 +277,6 @@ class MT3D {
         return lista;
     }
 
-
     ortho(xMin, xMax, yMin, yMax, zMin, zMax)
     {
         let sX = 2/(xMax - xMin)
@@ -301,7 +300,6 @@ class MT3D {
         // this.skaliraj(sX,sY,sZ)
     }
 
-
     transKamera(){
         this.matrica = this.mnoziMatrice(this.kamera,this.matrica)
     }
@@ -312,11 +310,9 @@ class MT3D {
         let sY = (2*zMin)/(yMax - yMin)
         let sZ = (zMin+zMax)/(zMin - zMax)
         
-        
         let tX = (xMin+xMax)/(xMax - xMin)
         let tY = (yMin+yMax)/(yMax - yMin)
         let tZ = (2*zMin*zMax)/(zMin - zMax)
-
 
         let rez = [
             [sX, 0, tX, 0],

@@ -42,8 +42,8 @@
     let visina = 0;
     let a = 1;
     let brid = a/2
-    let xMax = yMax = 5, zMax = 5;
-    let xMin = yMin = -5, zMin = -5;
+    let xMax = yMax = 5, zMax = 1;
+    let xMin = yMin = -5, zMin = -7;
 
     window.addEventListener('load', (event) => {
       platno1 = document.getElementById("slika1");
@@ -102,7 +102,7 @@
 
       let kameraX = 10*Math.sin(korak)
       let kameraY = 10*Math.cos(korak)
-      let  kameraZ = 2
+      let  kameraZ = 2*Math.cos(korak)
       
 
       mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,-1)
@@ -241,7 +241,7 @@
 				// bottom row end
 			}
 
-    function kocka()
+      function kocka()
     {
       return [
         // front
