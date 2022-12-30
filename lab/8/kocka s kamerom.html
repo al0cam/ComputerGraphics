@@ -42,8 +42,8 @@
     let visina = 0;
     let a = 1;
     let brid = a/2
-    let xMax = yMax = 5, zMax = 5;
-    let xMin = yMin = -5, zMin = -5;
+    let xMax = 5,yMax = 1, zMax = 5;
+    let xMin = -5,yMin = -10, zMin = -5;
 
     window.addEventListener('load', (event) => {
       platno1 = document.getElementById("slika1");
@@ -55,8 +55,8 @@
 
       GPUprogram1.u_mTrans = gl.getUniformLocation(GPUprogram1, "u_mTrans");
       gl.enable(gl.DEPTH_TEST);
-      gl.enable(gl.CULL_FACE);
-      gl.enable(gl.BACK);
+      // gl.enable(gl.CULL_FACE);
+      // gl.enable(gl.BACK);
 
       mt3d = new MT3D();
 
@@ -100,10 +100,10 @@
 
       korak = (korak + 0.01)%(2*Math.PI)
 
-      let kameraX = Math.cos(korak)/1;
-      let kameraY = Math.sin(korak)/1;
+      let kameraX = Math.cos(korak);
+      let kameraY = Math.sin(korak);
       // let  kameraZ = 1;
-      let  kameraZ = Math.sin(korak)/3;
+      let  kameraZ = 0.1;
       
 
       mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)

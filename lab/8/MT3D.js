@@ -294,14 +294,14 @@ class MT3D {
             [0, 0, 0, 1]
         ]
 
-        this.matrica = this.mnoziMatrice(rez,this.matrica)
+        this.matrica = this.mnoziMatrice(this.matrica, rez)
         
         // this.pomakni(tX,tY,tZ)
         // this.skaliraj(sX,sY,sZ)
     }
 
     transKamera(){
-        this.matrica = this.mnoziMatrice(this.kamera,this.matrica)
+        this.matrica = this.mnoziMatrice(this.matrica, this.kamera)
     }
 
     persp(xMin, xMax, yMin, yMax, zMin, zMax)
@@ -321,7 +321,6 @@ class MT3D {
             [0, 0, -1, 0]
         ]
 
-        this.matrica = this.mnoziMatrice(rez,this.matrica)
-
+        this.matrica = this.mnoziMatrice(this.matrica, rez)
     }
 }
