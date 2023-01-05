@@ -98,16 +98,16 @@
       // korak = korak%(360)+0.01;
       mt3d.identitet()
 
-      korak = (korak + 0.01)%(2*Math.PI)
+      korak = (korak + 0.1)%(2*Math.PI)
 
-      let kameraX = 10*Math.sin(korak)
-      let kameraY = 10*Math.cos(korak)
-      let  kameraZ = 2*Math.cos(korak)
+      let kameraX = Math.sin(korak)*10
+      let kameraY = Math.cos(korak)*10
+      let  kameraZ = Math.cos(korak)*50
       
 
-      mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,-1)
-      mt3d.transKamera();
       mt3d.persp(xMin, xMax, yMin, yMax, zMin, zMax)
+      mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
+      mt3d.transKamera();
 
       iscrtaj(floorY(), gl.LINE_LOOP, GPUprogram1.floorVAO)
       iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)

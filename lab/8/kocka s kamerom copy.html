@@ -106,9 +106,9 @@
       let  kameraZ = Math.sin(korak);
       
 
+      mt3d.persp(xMin, xMax, yMin, yMax, zMin, zMax)
       mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
       mt3d.transKamera();
-      mt3d.persp(xMin, xMax, yMin, yMax, zMin, zMax)
 
       // mt3d.rotirajY(90)
       iscrtaj(floorY(), gl.LINE_STRIP, GPUprogram1.floorVAO)

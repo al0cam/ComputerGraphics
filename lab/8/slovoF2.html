@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Roblox</title>
+    <script src="MT3D.js"></script>
+    <script src="RG-WebGL.js"></script>
+	
+
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        #version 300 es
+        in vec3 a_pozicija;
+        in vec3 a_ispunjenje;
+        out vec3 v_ispunjenje;
+        uniform mat4 u_matTrans;
+        void main() {
+            gl_Position = u_matTrans * vec4(a_pozicija, 1);
+            v_ispunjenje = a_ispunjenje;
+        }
+    </script>
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        #version 300 es
+        precision highp float;
+        in vec3 v_ispunjenje;
+        out vec4 ispunjenjePikseli;
+
+        void main() {
+            ispunjenjePikseli = vec4(v_ispunjenje, 1);
+        }
+    </script>   
+    
+
+
+    <script>
+        let verK=[], 
+            a = 0.1,
+            m = 0,
+            x = 0,
+            y = 0,
+            visina = 0,
+            korak = 0;
+        let mt3d;
+
+        let xMax = yMax = 1, zMax = 20;
+        let xMin = yMin = -1, zMin = 2;
+        window.addEventListener('load', (event) => {
+            platno1 = document.getElementById("slika1");
+            gl = platno1.getContext("webgl2");
+            if (!gl) alert("WebGL2 nije dostupan!");
+
+            GPUprogram1 = pripremiGPUprogram(gl, "vertex-shader", "fragment-shader");
+            gl.useProgram(GPUprogram1); 
+
+            GPUprogram1.u_mTrans = gl.getUniformLocation(GPUprogram1, "u_mTrans");
+            gl.enable(gl.DEPTH_TEST);
+            bufferi();
+
+            mt3d = new MT3D();
+
+            GPUprogram1.floorVAO = napuniSpremnike(floorY());
+            GPUprogram1.kockaVAO = napuniSpremnike(bridoviKocka());
+
+            cjelokupnaSlika();
+            // crtajSliku()
+        });
+
+
+        function cjelokupnaSlika() {
+            korak = (korak + 0.01)%(2*Math.PI)
+            y = 3 * Math.sin(korak)
+            x = 3 * Math.cos(korak),
+            visina = Math.cos(korak)      
+
+            gl.clearColor(0, 0, 0, 1);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.viewport(0, 0, platno1.width, platno1.height);
+
+            mt3d.identitet();
+            // mt3d.persp(1, -1, 1, -1, 2, 20);
+            mt3d.persp(xMin, xMax, yMin, yMax, zMin, zMax)
+
+            mt3d.postaviKameru(x, y, visina, 0, 0, 0, 0, 0, -1);
+            mt3d.transKamera()
+            
+            napraviGrid();
+            
+            mt3d.pomakni(0,0,-a)
+            napraviKocku(0, 0, 0.4, 0, 0, 0);
+            requestAnimationFrame(cjelokupnaSlika);
+        }
+        
+        function crtajSliku()
+        {
+            gl.clearColor(0.5, 0.5, 0.5, 1);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            gl.viewport(0, 0, platno1.width, platno1.height);
+
+            mt3d.identitet()
+
+            korak = (korak + 0.01)%(2*Math.PI)
+
+            let kameraX = Math.cos(korak)*5;
+            let kameraY = Math.sin(korak)*5;
+            // let  kameraZ = 1;
+            let  kameraZ = Math.sin(korak)*3;
+            
+
+            // mt3d.ortho(xMin, xMax, yMin, yMax, zMin, zMax)
+            mt3d.persp(xMin, xMax, yMin, yMax, zMin, zMax)
+
+            mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
+            mt3d.transKamera();
+
+            iscrtaj(floorY(), gl.LINE_STRIP, GPUprogram1.floorVAO)
+            iscrtaj(bridoviKocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+
+            requestAnimationFrame(crtajSliku)
+        }
+        
+        function napraviGrid(){
+            gl.uniformMatrix4fv(GPUprogram1.u_matTrans, false, mt3d.lista());
+            gl.bindVertexArray(floorVAO);
+            gl.drawArrays(gl.LINES, 0, crteGrid().length);
+        }
+        function napraviKocku() {
+            gl.uniformMatrix4fv(GPUprogram1.u_matTrans, false, mt3d.lista());
+            gl.bindVertexArray(kockaVAO);
+            gl.drawArrays(gl.TRIANGLES, 0, bridoviKocka().length);
+        }
+
+        function iscrtaj(vrhovi, vrstaCrte, VAO) {
+            gl.uniformMatrix4fv(GPUprogram1.u_mTrans, false, mt3d.lista())
+            gl.bindVertexArray(VAO);
+            gl.drawArrays(vrstaCrte, 0, vrhovi.length);
+        } 
+
+
+        function crteGrid() {
+            let floor = []
+            for (var i = 0; i <= 20; i++) {
+                floor.push([-1 + i * 0.1, -1, 0, 1, 1, 1]);
+                floor.push([-1 + i * 0.1, 1, 0, 1, 1, 1]);
+                floor.push([-1, i * 0.1, 0, 1, 1, 1]);
+                floor.push([-1, i * 0.1, 0, 1, 1, 1]);
+            }
+            for (var i = 0; i <= 20; i++) {
+                floor.push([i * 0.1, -1, 0, 1, 1, 1]);
+                floor.push([i * 0.1, -1, 0, 1, 1, 1]);
+                floor.push([-1, -1 + i * 0.1, 0, 1, 1, 1]);
+                floor.push([1, -1 + i * 0.1, 0, 1, 1, 1]);
+            }
+            return floor;
+        }
+
+        function floorY()
+        { 
+            GPUprogram1.floor = []
+            
+            if(GPUprogram1.floor.length == 0)
+            {
+                for(let i = yMin; i <= yMax; i++)
+                {
+                    GPUprogram1.floor.push(
+                        [xMax, i, -a, 0, 1, 0],
+                        [xMin, i, -a, 0, 1, 0],
+                        [xMax, i, -a, 0, 1, 0],
+                    )
+                }
+                for(let i = xMin; i <= xMax; i++)
+                {
+                    GPUprogram1.floor.push(
+                        [i, yMax, -a, 0, 1, 0],
+                        [i, yMin, -a, 0, 1, 0],
+                        [i, yMax, -a, 0, 1, 0],
+                    )
+                }
+            }
+            return GPUprogram1.floor;
+        }
+
+
+        function bridoviKocka() {
+            return [
+                // front
+                [-a, a, -a,  0, 1, 0],
+                [a, -a, -a,  0, 1, 0],
+                [-a, -a, -a,  0, 1, 0],
+                
+                [a, -a, -a,  0, 1, 0],
+                [-a, a, -a,  0, 1, 0],
+                [a, a, -a,  0, 1, 0],
+              
+                // left
+                [-a, a, -a,  1, 0, 0],
+                [-a, -a, a,  1, 0, 0],
+                [-a, a, a,  1, 0, 0],
+        
+                [-a, -a, a,  1, 0, 0],
+                [-a, a, -a,  1, 0, 0],
+                [-a, -a, -a,  1, 0, 0],
+        
+                // bot
+                [-a, -a, -a,  0, 0, 0],
+                [a, -a, a,  0, 0, 0],
+                [-a, -a, a,  0, 0, 0],
+                
+                [a, -a, a,  0, 0, 0],
+                [-a, -a, -a,  0, 0, 0],
+                [a, -a, -a,  0, 0, 0],
+        
+                // right
+                [a, -a, -a,  0, 0, 1],
+                [a, a, a,  0, 0, 1],
+                [a, -a, a,  0, 0, 1],
+        
+                [a, a, a,  0, 0, 1],
+                [a, -a, -a,  0, 0, 1],
+                [a, a, -a,  0, 0, 1],
+        
+                // back
+                [a, -a, a,  1, 1, 1],
+                [-a, a, a,  1, 1, 1],
+                [-a, -a, a,  1, 1, 1],
+                
+                [-a, a, a,  1, 1, 1],
+                [a, -a, a,  1, 1, 1],
+                [a, a, a,  1, 1, 1],
+        
+                // top
+                [a, a, a,  1, 0, 1],
+                [-a, a, a,  1, 0, 1],
+                [-a, a, -a,  1, 0, 1],
+        
+                [-a, a, -a,  1, 0, 1],
+                [a, a, a,  1, 0, 1],
+                [a, a, -a,  1, 0, 1],
+              ];
+        }
+
+
+        function napuniSpremnike(vrhovi) {
+            GPUprogram1.a_vrhXY = gl.getAttribLocation(GPUprogram1, "a_vrhXY");
+            GPUprogram1.a_boja = gl.getAttribLocation(GPUprogram1, "a_boja");
+            
+            let VAO = gl.createVertexArray();
+            gl.bindVertexArray(VAO);
+            gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+
+            gl.enableVertexAttribArray(GPUprogram1.a_vrhXY);
+            gl.vertexAttribPointer(GPUprogram1.a_vrhXY, 3, gl.FLOAT, false, 24, 0);
+
+            gl.enableVertexAttribArray(GPUprogram1.a_boja);
+            gl.vertexAttribPointer(GPUprogram1.a_boja, 3, gl.FLOAT, false, 24, 12);
+            
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vrhovi.flat()), gl.STATIC_DRAW);
+            return VAO;
+        }
+
+        function bufferi() {
+            GPUprogram1.u_matTrans = gl.getUniformLocation(GPUprogram1, "u_matTrans");
+            GPUprogram1.a_pozicija = gl.getAttribLocation(GPUprogram1, "a_pozicija");
+            GPUprogram1.a_ispunjenje = gl.getAttribLocation(GPUprogram1, "a_ispunjenje");
+            ///kockice
+            kockaVAO = gl.createVertexArray();
+            gl.bindVertexArray(kockaVAO);
+            gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+
+            gl.enableVertexAttribArray(GPUprogram1.a_pozicija);
+            gl.vertexAttribPointer(GPUprogram1.a_pozicija, 3, gl.FLOAT, false, 24, 0);
+
+            gl.enableVertexAttribArray(GPUprogram1.a_ispunjenje);
+            gl.vertexAttribPointer(GPUprogram1.a_ispunjenje, 3, gl.FLOAT, false, 24, 12);
+
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bridoviKocka().flat()), gl.STATIC_DRAW);
+
+            
+            //grid
+            floorVAO = gl.createVertexArray();
+            gl.bindVertexArray(floorVAO);
+            gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+            
+            gl.enableVertexAttribArray(GPUprogram1.a_pozicija);
+            gl.vertexAttribPointer(GPUprogram1.a_pozicija, 3, gl.FLOAT, false, 24, 0);
+
+            gl.enableVertexAttribArray(GPUprogram1.a_ispunjenje);
+            gl.vertexAttribPointer(GPUprogram1.a_ispunjenje, 3, gl.FLOAT, false, 24, 12);
+
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(crteGrid().flat()), gl.STATIC_DRAW);
+        }
+
+    </script>
+</head>
+
+<body>
+    <div style="float: left; margin-left: 50px; margin-bottom:50px;">
+        <h1>Roblox</h1>
+        <canvas id="slika1" width="600" height="600" style="border:5px solid #000000">
+            Preglednik ne podržava HTML5 canvas.
+        </canvas>
+    </div>
+</body>
+
+</html>

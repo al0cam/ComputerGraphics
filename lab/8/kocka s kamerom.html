@@ -42,8 +42,8 @@
     let visina = 0;
     let a = 1;
     let brid = a/2
-    let xMax = 5,yMax = 1, zMax = 5;
-    let xMin = -5,yMin = -10, zMin = -5;
+    let xMax = 5, yMax = 5, zMax = 10;
+    let xMin = -5, yMin = -5, zMin = -10;
 
     window.addEventListener('load', (event) => {
       platno1 = document.getElementById("slika1");
@@ -60,7 +60,7 @@
 
       mt3d = new MT3D();
 
-      GPUprogram1.floorVAO = napuniSpremnike(floorYMaxMin());
+      GPUprogram1.floorVAO = napuniSpremnike(floorY());
       GPUprogram1.kockaVAO = napuniSpremnike(kocka());
 
       crtajSliku();
@@ -100,50 +100,21 @@
 
       korak = (korak + 0.01)%(2*Math.PI)
 
-      let kameraX = Math.cos(korak);
-      let kameraY = Math.sin(korak);
+      let kameraX = Math.cos(korak)/2;
+      let kameraY = Math.sin(korak)/2;
       // let  kameraZ = 1;
-      let  kameraZ = 0.1;
+      let  kameraZ = Math.sin(korak)/2;;
       
 
+      mt3d.ortho(xMin, xMax, yMin, yMax, zMin, zMax)
       mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
       mt3d.transKamera();
-      mt3d.ortho(xMin, xMax, yMin, yMax, zMin, zMax)
 
-      iscrtaj(floorYMaxMin(), gl.LINE_STRIP, GPUprogram1.floorVAO)
+      iscrtaj(floorY(), gl.LINE_STRIP, GPUprogram1.floorVAO)
       iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
 
       requestAnimationFrame(crtajSliku)
     }
-
-    function floorYMaxMin()
-    { 
-      GPUprogram1.floor = []
-      
-      if(GPUprogram1.floor.length == 0)
-      {
-        
-        for(let i = yMax; i >= yMin; i--)
-        {
-          GPUprogram1.floor.push(
-            [xMax, i, -brid, 0, 1, 0],
-            [xMin, i, -brid, 0, 1, 0],
-            [xMax, i, -brid, 0, 1, 0],
-          )
-        }
-        for(let i = xMax; i >= xMin; i--)
-        {
-          GPUprogram1.floor.push(
-            [i, yMax, -brid, 0, 1, 0],
-            [i, yMin, -brid, 0, 1, 0],
-            [i, yMax, -brid, 0, 1, 0],
-          )
-        }
-        
-      }
-      return GPUprogram1.floor;
-    }
-
 
     function floorY()
     { 
@@ -151,20 +122,20 @@
       
       if(GPUprogram1.floor.length == 0)
       {
-        for(let i = yMax; i >= yMin; i--)
+        for(let i = yMin; i <= yMax; i++)
         {
           GPUprogram1.floor.push(
-            [xMin, i, -brid, 0, 1, 0],
             [xMax, i, -brid, 0, 1, 0],
             [xMin, i, -brid, 0, 1, 0],
+            [xMax, i, -brid, 0, 1, 0],
           )
         }
-        for(let i = xMax; i >= xMin; i--)
+        for(let i = xMin; i <= xMax; i++)
         {
           GPUprogram1.floor.push(
-            [i, yMin, -brid, 0, 1, 0],
             [i, yMax, -brid, 0, 1, 0],
             [i, yMin, -brid, 0, 1, 0],
+            [i, yMax, -brid, 0, 1, 0],
           )
         }
       }

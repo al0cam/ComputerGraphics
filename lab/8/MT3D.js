@@ -295,7 +295,6 @@ class MT3D {
         ]
 
         this.matrica = this.mnoziMatrice(this.matrica, rez)
-        
         // this.pomakni(tX,tY,tZ)
         // this.skaliraj(sX,sY,sZ)
     }
