@@ -83,9 +83,9 @@
               ]
 
               let vektor2 = [
-                x - xPrevious2, 
-                y - yPrevious2, 
-                z - zPrevious2
+                xPrevious2 - x, 
+                yPrevious2 - y, 
+                zPrevious2 - z
               ]
 
               let vektor3 = [
@@ -95,13 +95,13 @@
               ]
 
               let vektor4 = [
-                xCurrentMeridianPreviousParallel - xPreviousMeridian, 
-                yCurrentMeridianPreviousParallel - yPreviousMeridian, 
-                zCurrentMeridianPreviousParallel - zPreviousMeridian
+                xPreviousMeridian - xCurrentMeridianPreviousParallel, 
+                yPreviousMeridian - yCurrentMeridianPreviousParallel, 
+                zPreviousMeridian - zCurrentMeridianPreviousParallel
               ]
 
-              let normala = calculateNormal(vektor2,vektor1)
-              let normala2 = calculateNormal(vektor4,vektor3)
+              let normala = calculateNormal(vektor1,vektor2)
+              let normala2 = calculateNormal(vektor3,vektor4)
 
               vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala].flat())
               vrhovi.push([xPrevious2,yPrevious2,zPrevious2, normala].flat())
@@ -149,14 +149,14 @@
           // donja baza valjka
           gl.drawArrays(gl.TRIANGLES, 0, vrhovi.length);
 
-          alpha += (Math.PI / 180)/3;
+          alpha += (Math.PI / 180)/2;
           requestAnimationFrame(iscrtaj);
         } // iscrtaj
 
         var alpha = 0; // kut rotacije koji se koristi kod animacije
         var n = 32; // broj stranica koje čine plašt valjka
         let mt3d = new MT3D();
-        let vrhovi = kugla(0.7, 3, 3);
+        let vrhovi = kugla(0.7, 25, 32);
         napuniSpremnike();
 
         // vektori položaja izvora svjetlosti i kamere
