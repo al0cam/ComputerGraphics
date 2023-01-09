@@ -80,20 +80,20 @@
               let normala = mt3d.vektorskiProdukt(vektor3,vektor4)
               let normala2 = mt3d.vektorskiProdukt(vektor1,vektor2)
 
-              vrhovi.push(xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala)
-              vrhovi.push(xPrevious2,yPrevious2,zPrevious2, normala)
-              vrhovi.push(x,y,z, normala)
+              vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala].flat())
+              vrhovi.push([xPrevious2,yPrevious2,zPrevious2, normala].flat())
+              vrhovi.push([x,y,z, normala].flat())
 
-              vrhovi.push(x,y,z, normala2)
-              vrhovi.push(xCurrentMeridianPreviousParallel,yCurrentMeridianPreviousParallel,zCurrentMeridianPreviousParallel, normala2)
-              vrhovi.push(xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala2)
+              vrhovi.push([x,y,z, normala2].flat())
+              vrhovi.push([xCurrentMeridianPreviousParallel,yCurrentMeridianPreviousParallel,zCurrentMeridianPreviousParallel, normala2].flat())
+              vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala2].flat())
               iPrevious = i;
             }
             thetaPrevious = theta;
           }
 
           console.log("vrhovi.length: ", vrhovi.length);
-          return vrhovi.flat();
+          return vrhovi;
         } // valjak
 
 
@@ -106,8 +106,7 @@
           gl.enableVertexAttribArray(GPUprog1.a_normala2);
           gl.vertexAttribPointer(GPUprog1.a_vrhXYZ, 3, gl.FLOAT, false, 24, 0);
           gl.vertexAttribPointer(GPUprog1.a_normala2, 3, gl.FLOAT, false, 24, 12);
-          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vrhovi.flat()),
-            gl.STATIC_DRAW);
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vrhovi.flat()), gl.STATIC_DRAW);
         } // napuni spremnike
 
         function iscrtaj() {
@@ -115,7 +114,7 @@
           gl.clear(gl.COLOR_BUFFER_BIT);
           gl.viewport(0, 0, platno1.width, platno1.height);
 
-          gl.uniform3fv(GPUprog1.u_izvorXYZ, [-1,0,-1]);
+          gl.uniform3fv(GPUprog1.u_izvorXYZ, [1,1,-1]);
 
           // matrica transformacije - rotacija oko x osi za kut alpha
           gl.uniformMatrix4fv(GPUprog1.u_mTrans, false,

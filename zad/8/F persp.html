@@ -17,7 +17,7 @@
     out vec3 v_boja;
 
     void main() {
-      gl_Position = vec4(u_mTrans*vec4(a_vrhXY,1.0));
+      gl_Position = vec4(u_mTrans*vec4(a_vrhXY,1));
       v_boja = a_boja;
     }
   </script>
@@ -42,8 +42,9 @@
     let visina = 0;
     let a = 1;
     let brid = a/2
-    let xMax = yMax = 5, zMax = 5;
-    let xMin = yMin = -5, zMin = -5;
+
+    let xMax = yMax = 5, zMax = 20;
+    let xMin = yMin = -5, zMin = 2;
 
     window.addEventListener('load', (event) => {
       platno1 = document.getElementById("slika1");
@@ -55,14 +56,12 @@
 
       GPUprogram1.u_mTrans = gl.getUniformLocation(GPUprogram1, "u_mTrans");
       gl.enable(gl.DEPTH_TEST);
-      // gl.enable(gl.CULL_FACE);
-      // gl.cullFace(gl.BACK);
-      // gl.enable(gl.FRONT);
+      gl.enable(gl.CULL_FACE);
 
       mt3d = new MT3D();
 
-      GPUprogram1.kockaVAO = napuniSpremnike(kocka());
       GPUprogram1.floorVAO = napuniSpremnike(floorY());
+      GPUprogram1.kockaVAO = napuniSpremnike(kocka());
 
       crtajSliku();
     });
@@ -86,7 +85,6 @@
     } 
 
     function iscrtaj(vrhovi, vrstaCrte, VAO) {
-      gl.viewport(0, 0, platno1.width, platno1.height);
       gl.bindVertexArray(VAO);
       gl.uniformMatrix4fv(GPUprogram1.u_mTrans, false, mt3d.lista())
       gl.drawArrays(vrstaCrte, 0, vrhovi.length);
@@ -96,27 +94,51 @@
     {
       gl.clearColor(0.5, 0.5, 0.5, 1);
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-      // korak = korak%(360)+0.01;
+      gl.viewport(0, 0, platno1.width, platno1.height);
+
       mt3d.identitet()
 
       korak = (korak + 0.01)%(2*Math.PI)
 
-      let kameraX = 10*Math.sin(korak)
-      let kameraY = 10*Math.cos(korak)
-      let  kameraZ = 2
+      let kameraX = Math.cos(korak)*6;
+      let kameraY = Math.sin(korak)*6;
+      let  kameraZ = 1
       
 
-      mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,-1)
-      mt3d.transKamera();
       mt3d.persp(xMin, xMax, yMin, yMax, zMin, zMax)
 
-      iscrtaj(floorY(), gl.LINE_LOOP, GPUprogram1.floorVAO)
-      f()
+      mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
+      mt3d.transKamera();
 
+      iscrtaj(floorY(), gl.LINE_STRIP, GPUprogram1.floorVAO)
+      f()
       requestAnimationFrame(crtajSliku)
     }
 
+    function f()
+    {
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
 
+      mt3d.pomakni(0,0,a)
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+
+      mt3d.pomakni(0,a,0)
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+      
+      mt3d.pomakni(0,-a,a)
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+      
+      mt3d.pomakni(0,0,a)
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+
+
+      mt3d.pomakni(0,a,0)
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+
+      mt3d.pomakni(0,a,0)
+      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+      
+    }
     function floorY()
     { 
       GPUprogram1.floor = []
@@ -126,17 +148,17 @@
         for(let i = yMin; i <= yMax; i++)
         {
           GPUprogram1.floor.push(
-            [xMin, i, -brid, 0, 1, 0],
             [xMax, i, -brid, 0, 1, 0],
             [xMin, i, -brid, 0, 1, 0],
+            [xMax, i, -brid, 0, 1, 0],
           )
         }
         for(let i = xMin; i <= xMax; i++)
         {
           GPUprogram1.floor.push(
-            [i, yMin, -brid, 0, 1, 0],
             [i, yMax, -brid, 0, 1, 0],
             [i, yMin, -brid, 0, 1, 0],
+            [i, yMax, -brid, 0, 1, 0],
           )
         }
       }
@@ -152,64 +174,21 @@
         for(let i = zMin; i <= zMax; i++)
         {
           GPUprogram1.floor.push(
-            [xMin, -brid, i, 0, 1, 0],
-            [xMax, -brid, i, 0, 1, 0],
-            [xMin, -brid, i, 0, 1, 0],
+            [xMin, -brid, brid, 0, 1, 0],
+            [xMax, -brid, brid, 0, 1, 0],
+            [xMin, -brid, brid, 0, 1, 0],
           )
         }
         for(let i = xMin; i <= xMax; i++)
         {
           GPUprogram1.floor.push(
-            [i, -brid, zMin, 0, 1, 0],
-            [i, -brid, zMax, 0, 1, 0],
-            [i, -brid, zMin, 0, 1, 0],
+            [brid, -brid, zMin, 0, 1, 0],
+            [brid, -brid, zMax, 0, 1, 0],
+            [brid, -brid, zMin, 0, 1, 0]
           )
         }
       }
       return GPUprogram1.floor;
-    }
-
-    function f()
-    {
-      // columnt start
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
-
-      mt3d.pomakni(0,0,a)
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
-
-      mt3d.pomakni(0,0,a)
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
-
-      mt3d.pomakni(0,a,0)
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
-
-      mt3d.pomakni(0,-a,a)
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
-      // columnt end
-
-      // top row start
-      mt3d.pomakni(0,0,a)
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
-      // top row end
-
-      // bottom row start
-      mt3d.pomakni(0,a,0)
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
-      // bottom row end
-      
-      // columnt start
-      mt3d.pomakni(0,a,-a)
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
-
-      mt3d.pomakni(0,0,-a*2)
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
-
-      mt3d.pomakni(0,0,-a)
-      mt3d.pomakni(0,-a,0)
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
-
-
-
     }
 
     function kocka()

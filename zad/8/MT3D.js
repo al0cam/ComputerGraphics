@@ -277,7 +277,6 @@ class MT3D {
         return lista;
     }
 
-
     ortho(xMin, xMax, yMin, yMax, zMin, zMax)
     {
         let sX = 2/(xMax - xMin)
@@ -295,15 +294,13 @@ class MT3D {
             [0, 0, 0, 1]
         ]
 
-        this.matrica = this.mnoziMatrice(rez,this.matrica)
-        
+        this.matrica = this.mnoziMatrice(this.matrica, rez)
         // this.pomakni(tX,tY,tZ)
         // this.skaliraj(sX,sY,sZ)
     }
 
-
     transKamera(){
-        this.matrica = this.mnoziMatrice(this.kamera,this.matrica)
+        this.matrica = this.mnoziMatrice(this.matrica, this.kamera)
     }
 
     persp(xMin, xMax, yMin, yMax, zMin, zMax)
@@ -312,11 +309,9 @@ class MT3D {
         let sY = (2*zMin)/(yMax - yMin)
         let sZ = (zMin+zMax)/(zMin - zMax)
         
-        
         let tX = (xMin+xMax)/(xMax - xMin)
         let tY = (yMin+yMax)/(yMax - yMin)
         let tZ = (2*zMin*zMax)/(zMin - zMax)
-
 
         let rez = [
             [sX, 0, tX, 0],
@@ -325,7 +320,6 @@ class MT3D {
             [0, 0, -1, 0]
         ]
 
-        this.matrica = this.mnoziMatrice(rez,this.matrica)
-
+        this.matrica = this.mnoziMatrice(this.matrica, rez)
     }
 }

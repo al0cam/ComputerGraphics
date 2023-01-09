@@ -59,97 +59,38 @@
           return vrhovi;
         } // valjak
 
-        function properStozac(r, h, n) {
-          var vrhovi = []; 
-
-          // n-terokut - donja baza valjka na z = -h / 2
-          // vektori normale su prema dolje, tj. [0, 0, -1]
-          // vrhovi.push(0, 0, -h / 2, 0, 0, -1); // središte za TRIANGLE_FAN
-          // let iPrevious = 0
-          // let k = 0;
-          // for(let i = 0; i <= 2*Math.PI; i+=(2*Math.PI)/n) {
-          //   vrhovi.push(0, 0, -h / 2, 0, 0, -1); // središte za TRIANGLE_FAN
-          //   vrhovi.push(r * Math.cos(i), r * Math.sin(i), -h / 2, 0, 0, -1);
-          //   vrhovi.push(r * Math.cos(iPrevious), r * Math.sin(iPrevious), -h / 2, 0, 0, -1);
-          //   iPrevious = i;
-          //   k++;
-          // } // for
-
-          for(let i = - 2*Math.PI/n; i <= 2*Math.PI; i+=(2*Math.PI)/n) {
-            vrhovi.push(r * Math.cos(i), r * Math.sin(i), -h / 2, 0, 0, -1);
-            vrhovi.push(r * Math.cos(i+2*Math.PI/n), r * Math.sin(i+2*Math.PI/n), -h / 2, 0, 0, -1);
-            vrhovi.push(0, 0, -h / 2, 0, 0, -1); // središte za TRIANGLE_FAN
-          } // for
-
-          // let phi = 2 * Math.PI / n;
-          // let phiPrevious = 0
-          // for(let i = 0; i <= n; i++) {
-          //   vrhovi.push(0, 0, -h / 2, 0, 0, -1); // središte za TRIANGLE_FAN
-          //   vrhovi.push(r * Math.cos(phi), r * Math.sin(phi), -h / 2, 0, 0, -1);
-          //   vrhovi.push(r * Math.cos(phiPrevious), r * Math.sin(phiPrevious), -h / 2, 0, 0, -1);
-          //   phiPrevious = phi;
-          //   phi += 2 * Math.PI / n;
-          // } // for
-
-          console.log(vrhovi.length);
-          return vrhovi;
-        } // valjak
-
 
         function stozac(r, h, n) {
           var vrhovi = []; 
 
           // n-terokut - donja baza valjka na z = -h / 2
           // vektori normale su prema dolje, tj. [0, 0, -1]
-          vrhovi.push(0, 0, -h / 2, 0, 0, -1); // središte za TRIANGLE_FAN
-          let phi = 2 * Math.PI / n;
-          for(let i = 0; i <= n; i++) {
-            vrhovi.push(r * Math.cos(phi), r * Math.sin(phi), -h / 2, 0, 0, -1);
-            phi += 2 * Math.PI / n;
-          } // for
+          // vrhovi.push(0, 0, -h / 2, 0, 0, -1); // središte za TRIANGLE_FAN
+          // let phi = 2 * Math.PI / n;
+          // for(let i = 0; i <= n; i++) {
+          //   vrhovi.push(r * Math.cos(phi), r * Math.sin(phi), -h / 2, 0, 0, -1);
+          //   phi += 2 * Math.PI / n;
+          // } // for
 
-          // n-terokut - gornja baza valjka na z = h / 2
-          // vektori normale su prema gore, tj. [0, 0, 1]
-          vrhovi.push(0, 0, h / 2, 0, 0, 1); // središte za TRIANGLE_FAN
-          phi = 2 * Math.PI;
-          for(let i = 0; i <= n; i++) {
-            vrhovi.push(0, 0 , h / 2, 0, 0, 1);
-            phi -= 2 * Math.PI / n;
+
+          for(let i = - 2*Math.PI/n; i <= 2*Math.PI; i+=(2*Math.PI)/n) {
+            vrhovi.push([r * Math.cos(i), r * Math.sin(i), -h / 2, 0, 0, -1]);
+            vrhovi.push([r * Math.cos(i+2*Math.PI/n), r * Math.sin(i+2*Math.PI/n), -h / 2, 0, 0, -1]);
+            vrhovi.push([0, 0, -h / 2, 0, 0, -1]); // središte za TRIANGLE_FAN
           } // for
+          
         
           // plašt valjka
-          let iPrevious = 0;
-          for(let i = 0; i <= 2*Math.PI; i+=(2*Math.PI)/n) {
-            let cPrevious = Math.cos(iPrevious);
-            let sPrevious = Math.sin(iPrevious);
-            let xPrevious = r * cPrevious;
-            let yPrevious = r * sPrevious;
-
-            let c = Math.cos(i);
-            let s = Math.sin(i);
-            let x = r * c;
-            let y = r * s;
-
-
-            // let vektor1 = [
-            //   x - xCurrentMeridianPreviousParallel, 
-            //   y - yCurrentMeridianPreviousParallel, 
-            //   z - zCurrentMeridianPreviousParallel
-            // ]
-
-            // let vektor2 = [
-            //   xPreviousMeridian - xCurrentMeridianPreviousParallel, 
-            //   yPreviousMeridian - yCurrentMeridianPreviousParallel, 
-            //   zPreviousMeridian - zCurrentMeridianPreviousParallel
-            // ]
-
-            // let normala = mt3d.vektorskiProdukt(vektor1,vektor2)
-
-            vrhovi.push(x, y, -h / 2, c, s, 0);
-            // vrhovi.push(xPrevious, yPrevious, -h / 2, c, s, 0);
-            vrhovi.push(0, 0, h / 2, c, s, 0);
-            iPrevious = i;
-          } // for
+          // phi = 0;
+          // for(let i = 0; i <= n; i++) {
+          //   let c = Math.cos(phi);
+          //   let s = Math.sin(phi);
+          //   let x = r * c;
+          //   let y = r * s;
+          //   vrhovi.push(x, y, -h / 2, c, s, 0);
+          //   vrhovi.push(x, y, h / 2, c, s, 0);
+          //   phi += 2 * Math.PI / n;
+          // } // for
 
           console.log("vrhovi.length: ", vrhovi.length);
           return vrhovi;
@@ -164,7 +105,8 @@
           gl.enableVertexAttribArray(GPUprog1.a_normala);
           gl.vertexAttribPointer(GPUprog1.a_vrhXYZ, 3, gl.FLOAT, false, 24, 0);
           gl.vertexAttribPointer(GPUprog1.a_normala, 3, gl.FLOAT, false, 24, 12);
-          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vrhovi.flat()), gl.STATIC_DRAW);
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vrhovi.flat()),
+            gl.STATIC_DRAW);
         } // napuni spremnike
 
         function iscrtaj() {
@@ -172,17 +114,17 @@
           gl.clear(gl.COLOR_BUFFER_BIT);
           gl.viewport(0, 0, platno1.width, platno1.height);
 
-          if (smijer == 180)
-            smijer = false;
-          else if (smijer == 0)
-            smijer = true
+          // if (smijer == 180)
+          //   smijer = false;
+          // else if (smijer == 0)
+          //   smijer = true
           // korak = smijer ? (korak + 0.01) : (korak - 0.01)
 
-          let x = 1
-          let y = 1
-          let z = -1
+          let x = 1;
+          let y = 1;
+          let z = -1;
 
-          gl.uniform3fv(GPUprog1.u_izvorXYZ, [-1,0,-1]);
+          gl.uniform3fv(GPUprog1.u_izvorXYZ, [x,y,z]);
 
 
           // matrica transformacije - rotacija oko x osi za kut alpha
@@ -190,28 +132,24 @@
             [1, 0, 0, 0,
              0, Math.cos(alpha), Math.sin(alpha), 0,
              0, -Math.sin(alpha), Math.cos(alpha), 0, 
-             0, 0, 0, 1]);
-
-          // gl.uniformMatrix4fv(GPUprog1.u_mTrans, false,
-          //   [1, 0, 0, 0,
-          //    0, 1, 0, 0,
-          //    0, 1, 1, 0, 
-          //    0, 0, 0, 1]);   
+             0, 0, 0, 1]);3
 
           // donja baza valjka
+          // gl.drawArrays(gl.TRIANGLE_FAN, 0, n + 2);
+
           gl.drawArrays(gl.TRIANGLES, 0, vrhovi.length);
 
-          // plašt valjka
-          // gl.drawArrays(gl.TRIANGLE_STRIP, 2 * (n + 2), 2 * n + 2);
 
           alpha += (Math.PI / 180)/2;
           requestAnimationFrame(iscrtaj);
         } // iscrtaj
-        var n = 32; // broj stranica koje čine plašt valjka
-        let vrhovi = valjak(0.5, 1, n)
+
+        
         let smijer = true;
         let korak = 0;
         var alpha = 0; // kut rotacije koji se koristi kod animacije
+        var n = 32; // broj stranica koje čine plašt valjka
+        let vrhovi = stozac(0.5,1,n);
         napuniSpremnike();
 
         // vektori položaja izvora svjetlosti i kamere
