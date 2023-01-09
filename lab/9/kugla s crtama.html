@@ -23,6 +23,29 @@
         GPUprog1.u_kameraXYZ = gl.getUniformLocation(GPUprog1, "u_kameraXYZ");
         GPUprog1.u_boja = gl.getUniformLocation(GPUprog1, "u_boja");
 
+
+        function calculateNormal(vector1, vector2) {
+          // Create two vectors from the provided vectors
+          var vec1 = {x: vector1[0], y: vector1[1], z: vector1[2]};
+          var vec2 = {x: vector2[0], y: vector2[1], z: vector2[2]};
+
+          // Calculate the cross product of the two vectors
+          var normal = {
+            x: (vec1.y * vec2.z) - (vec1.z * vec2.y),
+            y: (vec1.z * vec2.x) - (vec1.x * vec2.z),
+            z: (vec1.x * vec2.y) - (vec1.y * vec2.x)
+          };
+
+          // Normalize the normal vector
+          var length = Math.sqrt((normal.x * normal.x) + (normal.y * normal.y) + (normal.z * normal.z));
+
+          normal.x /= length;
+          normal.y /= length;
+          normal.z /= length;
+
+          return [normal.x, normal.y, normal.z];
+        }
+
         function kugla(r, m, n) {
           var vrhovi = []; 
 
@@ -53,32 +76,32 @@
               let s = Math.sin(theta);
               let w = 0;
 
-              let vektor3 = [
+              let vektor1 = [
                 xPrevious2 - xPreviousMeridian, 
                 yPrevious2 - yPreviousMeridian, 
                 zPrevious2 - zPreviousMeridian
               ]
 
-              let vektor4 = [
+              let vektor2 = [
                 x - xPrevious2, 
                 y - yPrevious2, 
                 z - zPrevious2
               ]
 
-              let vektor1 = [
+              let vektor3 = [
                 x - xCurrentMeridianPreviousParallel, 
                 y - yCurrentMeridianPreviousParallel, 
                 z - zCurrentMeridianPreviousParallel
               ]
 
-              let vektor2 = [
+              let vektor4 = [
                 xCurrentMeridianPreviousParallel - xPreviousMeridian, 
                 yCurrentMeridianPreviousParallel - yPreviousMeridian, 
                 zCurrentMeridianPreviousParallel - zPreviousMeridian
               ]
 
-              let normala = mt3d.vektorskiProdukt(vektor3,vektor4)
-              let normala2 = mt3d.vektorskiProdukt(vektor1,vektor2)
+              let normala = calculateNormal(vektor2,vektor1)
+              let normala2 = calculateNormal(vektor4,vektor3)
 
               vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala].flat())
               vrhovi.push([xPrevious2,yPrevious2,zPrevious2, normala].flat())
@@ -137,7 +160,7 @@
         napuniSpremnike();
 
         // vektori položaja izvora svjetlosti i kamere
-        gl.uniform3fv(GPUprog1.u_kameraXYZ, [-10, 0, -10]);
+        gl.uniform3fv(GPUprog1.u_kameraXYZ, [10, 0, -10]);
 
         // boja izvora u RGB formatu
         gl.uniform3fv(GPUprog1.u_boja, [1.0, 1.0, 0.0]);
@@ -145,7 +168,7 @@
         
 
         // omogući selektivno odbacivanje
-        // gl.enable(gl.CULL_FACE);
+        gl.enable(gl.CULL_FACE);
 
         iscrtaj();
       } // WebGL2Aplikacija

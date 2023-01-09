@@ -4,6 +4,7 @@
 		<meta charset="UTF-8">
 		<title>Lambert i refleksija</title>
 		<script src="RG-WebGL.js"></script>
+		<script src="MT3D.js"></script>
 
 		<script>
 		  window.onload = WebGL2aplikacija;
@@ -59,38 +60,67 @@
           return vrhovi;
         } // valjak
 
+        function calculateNormal(vector1, vector2) {
+          // Create two vectors from the provided vectors
+          var vec1 = {x: vector1[0], y: vector1[1], z: vector1[2]};
+          var vec2 = {x: vector2[0], y: vector2[1], z: vector2[2]};
+
+          // Calculate the cross product of the two vectors
+          var normal = {
+            x: (vec1.y * vec2.z) - (vec1.z * vec2.y),
+            y: (vec1.z * vec2.x) - (vec1.x * vec2.z),
+            z: (vec1.x * vec2.y) - (vec1.y * vec2.x)
+          };
+
+          // Normalize the normal vector
+          var length = Math.sqrt((normal.x * normal.x) + (normal.y * normal.y) + (normal.z * normal.z));
+
+          normal.x /= length;
+          normal.y /= length;
+          normal.z /= length;
+
+          return [normal.x, normal.y, normal.z];
+        }
 
         function stozac(r, h, n) {
           var vrhovi = []; 
 
-          // n-terokut - donja baza valjka na z = -h / 2
-          // vektori normale su prema dolje, tj. [0, 0, -1]
-          // vrhovi.push(0, 0, -h / 2, 0, 0, -1); // središte za TRIANGLE_FAN
-          // let phi = 2 * Math.PI / n;
-          // for(let i = 0; i <= n; i++) {
-          //   vrhovi.push(r * Math.cos(phi), r * Math.sin(phi), -h / 2, 0, 0, -1);
-          //   phi += 2 * Math.PI / n;
-          // } // for
-
-
           for(let i = - 2*Math.PI/n; i <= 2*Math.PI; i+=(2*Math.PI)/n) {
-            vrhovi.push([r * Math.cos(i), r * Math.sin(i), -h / 2, 0, 0, -1]);
-            vrhovi.push([r * Math.cos(i+2*Math.PI/n), r * Math.sin(i+2*Math.PI/n), -h / 2, 0, 0, -1]);
-            vrhovi.push([0, 0, -h / 2, 0, 0, -1]); // središte za TRIANGLE_FAN
+
+            let xPeak = 0,
+                yPeak = 0,
+                zPeak = h/2;
+            
+            let x1 = r * Math.cos(i),
+                y1 = r * Math.sin(i),
+                z1 = -h/2;
+
+            let x2 = r * Math.cos(i+2*Math.PI/n),
+                y2 = r * Math.sin(i+2*Math.PI/n),
+                z2 = -h/2;
+
+            let vektor1 = [
+              xPeak - x2, 
+              yPeak - y2, 
+              zPeak - z2
+            ]
+
+            let vektor2 = [
+              x1 - x2, 
+              y1 - y2, 
+              z1 - z2
+            ]
+
+            let normala = calculateNormal(vektor1,vektor2)
+            
+            vrhovi.push([0, 0, -h / 2, 0, 0, -1]);
+            vrhovi.push([x1, y1, z1, 0, 0, -1]);
+            vrhovi.push([x2, y2, z2, 0, 0, -1]);
+
+            vrhovi.push([x1, y1, z1, normala].flat());
+            vrhovi.push([0, 0, h / 2, normala].flat()); // središte za TRIANGLE_FAN
+            vrhovi.push([x2, y2, z2, normala].flat());
           } // for
-          
-        
-          // plašt valjka
-          // phi = 0;
-          // for(let i = 0; i <= n; i++) {
-          //   let c = Math.cos(phi);
-          //   let s = Math.sin(phi);
-          //   let x = r * c;
-          //   let y = r * s;
-          //   vrhovi.push(x, y, -h / 2, c, s, 0);
-          //   vrhovi.push(x, y, h / 2, c, s, 0);
-          //   phi += 2 * Math.PI / n;
-          // } // for
 
           console.log("vrhovi.length: ", vrhovi.length);
           return vrhovi;
@@ -144,7 +174,7 @@
           requestAnimationFrame(iscrtaj);
         } // iscrtaj
 
-        
+        let mt3d = new MT3D();
         let smijer = true;
         let korak = 0;
         var alpha = 0; // kut rotacije koji se koristi kod animacije
@@ -159,7 +189,7 @@
         gl.uniform3fv(GPUprog1.u_boja, [1.0, 1.0, 0.0]);
 
         // omogući selektivno odbacivanje
-        // gl.enable(gl.CULL_FACE);
+        gl.enable(gl.CULL_FACE);
 
         iscrtaj();
       } // WebGL2Aplikacija
