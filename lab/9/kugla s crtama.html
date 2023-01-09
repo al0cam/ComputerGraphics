@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="hr"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="UTF-8">
+		<title>Lambert i refleksija</title>
+		<script src="RG-WebGL.js"></script>
+		<script src="MT3D.js"></script>
+
+		<script>
+		  window.onload = WebGL2aplikacija;
+
+		  function WebGL2aplikacija() {
+        var platno1 = document.getElementById("slika1");
+        gl = platno1.getContext("webgl2");
+        if (!gl) alert("WebGL2 nije dostupan!");
+
+        var GPUprog1 = pripremiGPUprogram(gl, "vertex-shader", "fragment-shader");
+        gl.useProgram(GPUprog1); // možemo imati više GPU programa
+
+        // povezivanje s uniform varijablama u programu za sjenčanje
+        GPUprog1.u_mTrans = gl.getUniformLocation(GPUprog1, "u_mTrans");
+        GPUprog1.u_izvorXYZ = gl.getUniformLocation(GPUprog1, "u_izvorXYZ");
+        GPUprog1.u_kameraXYZ = gl.getUniformLocation(GPUprog1, "u_kameraXYZ");
+        GPUprog1.u_boja = gl.getUniformLocation(GPUprog1, "u_boja");
+
+        function kugla(r, m, n) {
+          var vrhovi = []; 
+
+          let thetaPrevious = 0
+          let iPrevious = 0
+          for(let theta = 0; theta <= Math.PI; theta+=Math.PI/m)
+          {
+            for(let i = 0; i <= 2*Math.PI; i+=Math.PI/n)
+            {
+              let xPreviousMeridian = r*Math.cos(iPrevious)*Math.sin(thetaPrevious)
+              let yPreviousMeridian = r*Math.sin(iPrevious)*Math.sin(thetaPrevious)
+              let zPreviousMeridian = r*Math.cos(thetaPrevious)
+
+              let xPrevious2 = r*Math.cos(iPrevious)*Math.sin(theta)
+              let yPrevious2 = r*Math.sin(iPrevious)*Math.sin(theta)
+              let zPrevious2 = r*Math.cos(theta)
+
+              // Current Meridian Previous Parallel
+              let xCurrentMeridianPreviousParallel = r*Math.cos(i)*Math.sin(thetaPrevious)
+              let yCurrentMeridianPreviousParallel = r*Math.sin(i)*Math.sin(thetaPrevious)
+              let zCurrentMeridianPreviousParallel = r*Math.cos(thetaPrevious)
+
+              x = r*Math.cos(i)*Math.sin(theta)
+              y = r*Math.sin(i)*Math.sin(theta)
+              z = r*Math.cos(theta)
+              
+              let c = Math.cos(theta);
+              let s = Math.sin(theta);
+              let w = 0;
+
+              let vektor3 = [
+                xPrevious2 - xPreviousMeridian, 
+                yPrevious2 - yPreviousMeridian, 
+                zPrevious2 - zPreviousMeridian
+              ]
+
+              let vektor4 = [
+                x - xPrevious2, 
+                y - yPrevious2, 
+                z - zPrevious2
+              ]
+
+              let vektor1 = [
+                x - xCurrentMeridianPreviousParallel, 
+                y - yCurrentMeridianPreviousParallel, 
+                z - zCurrentMeridianPreviousParallel
+              ]
+
+              let vektor2 = [
+                xCurrentMeridianPreviousParallel - xPreviousMeridian, 
+                yCurrentMeridianPreviousParallel - yPreviousMeridian, 
+                zCurrentMeridianPreviousParallel - zPreviousMeridian
+              ]
+
+              let normala = mt3d.vektorskiProdukt(vektor3,vektor4)
+              let normala2 = mt3d.vektorskiProdukt(vektor1,vektor2)
+
+              vrhovi.push(xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala)
+              vrhovi.push(xPrevious2,yPrevious2,zPrevious2, normala)
+              vrhovi.push(x,y,z, normala)
+
+              vrhovi.push(x,y,z, normala2)
+              vrhovi.push(xCurrentMeridianPreviousParallel,yCurrentMeridianPreviousParallel,zCurrentMeridianPreviousParallel, normala2)
+              vrhovi.push(xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala2)
+              iPrevious = i;
+            }
+            thetaPrevious = theta;
+          }
+
+          console.log("vrhovi.length: ", vrhovi.length);
+          return vrhovi.flat();
+        } // valjak
+
+
+        function napuniSpremnike() {
+          GPUprog1.a_vrhXYZ = gl.getAttribLocation(GPUprog1, "a_vrhXYZ");
+          GPUprog1.a_normala2 = gl.getAttribLocation(GPUprog1, "a_normala2");
+        
+          gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+          gl.enableVertexAttribArray(GPUprog1.a_vrhXYZ);
+          gl.enableVertexAttribArray(GPUprog1.a_normala2);
+          gl.vertexAttribPointer(GPUprog1.a_vrhXYZ, 3, gl.FLOAT, false, 24, 0);
+          gl.vertexAttribPointer(GPUprog1.a_normala2, 3, gl.FLOAT, false, 24, 12);
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vrhovi.flat()),
+            gl.STATIC_DRAW);
+        } // napuni spremnike
+
+        function iscrtaj() {
+          gl.clearColor(0.5, 0.5, 0.5, 1);
+          gl.clear(gl.COLOR_BUFFER_BIT);
+          gl.viewport(0, 0, platno1.width, platno1.height);
+
+          gl.uniform3fv(GPUprog1.u_izvorXYZ, [-1,0,-1]);
+
+          // matrica transformacije - rotacija oko x osi za kut alpha
+          gl.uniformMatrix4fv(GPUprog1.u_mTrans, false,
+            [1, 0, 0, 0,
+             0, Math.cos(alpha), Math.sin(alpha), 0,
+             0, -Math.sin(alpha), Math.cos(alpha), 0, 
+             0, 0, 0, 1]);
+
+          // donja baza valjka
+          gl.drawArrays(gl.TRIANGLES, 0, vrhovi.length);
+
+          alpha += (Math.PI / 180)/3;
+          requestAnimationFrame(iscrtaj);
+        } // iscrtaj
+
+        var alpha = 0; // kut rotacije koji se koristi kod animacije
+        var n = 32; // broj stranica koje čine plašt valjka
+        let mt3d = new MT3D();
+        let vrhovi = kugla(0.7, 3, 3);
+        napuniSpremnike();
+
+        // vektori položaja izvora svjetlosti i kamere
+        gl.uniform3fv(GPUprog1.u_kameraXYZ, [-10, 0, -10]);
+
+        // boja izvora u RGB formatu
+        gl.uniform3fv(GPUprog1.u_boja, [1.0, 1.0, 0.0]);
+
+        
+
+        // omogući selektivno odbacivanje
+        // gl.enable(gl.CULL_FACE);
+
+        iscrtaj();
+      } // WebGL2Aplikacija
+		</script>
+
+		<script id="vertex-shader" type="x-shader/x-vertex">
+      #version 300 es
+      in vec4 a_vrhXYZ;
+      in vec3 a_normala2;
+      uniform mat4 u_mTrans;
+      uniform vec3 u_izvorXYZ;
+      uniform vec3 u_kameraXYZ;
+      out float v_svjetlina;
+
+      void main() {
+        vec4 vrh = u_mTrans * a_vrhXYZ; // primijeni matricu transformacije
+        vec3 normala2 = mat3(u_mTrans) * a_normala2; // transformacija normale
+
+        // Lambertov zakon
+        vec3 premaIzvoru = normalize(u_izvorXYZ - vec3(vrh));
+        v_svjetlina = dot(premaIzvoru, normala2);
+
+        // zakon refleksije
+        float refleksija = 0.0;
+        if(v_svjetlina > 0.0) {
+          vec3 premaKameri = normalize(u_kameraXYZ - vec3(vrh));
+          vec3 reflektiranaZraka = reflect(-premaIzvoru, normala2);
+          refleksija = max(dot(reflektiranaZraka, premaKameri), 0.0);
+          refleksija = pow(refleksija, 8.0);
+        }
+
+        v_svjetlina = v_svjetlina * 0.5 + refleksija * 0.5;
+        gl_Position = vrh;
+      }
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+      #version 300 es
+      precision highp float;
+      uniform vec3 u_boja;
+      in float v_svjetlina;
+      out vec4 bojaFragmenta;
+
+      void main() {
+        bojaFragmenta = vec4(v_svjetlina * u_boja, 1.0); // postavlja se boja fragmenta
+      }
+    </script>
+	</head>
+
+	<body>
+		<h1>Lambert i refleksija</h1>
+		<div>
+			<canvas id="slika1" style="border:5px solid black" width="500" height="500">
+				Vaš preglednik ne podržava HTML5 canvas.
+      </canvas>
+		</div>
+	
+</body></html>

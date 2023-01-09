@@ -77,20 +77,41 @@
           vrhovi.push(0, 0, h / 2, 0, 0, 1); // središte za TRIANGLE_FAN
           phi = 2 * Math.PI;
           for(let i = 0; i <= n; i++) {
-            vrhovi.push(r * Math.cos(phi), r * Math.sin(phi), h / 2, 0, 0, 1);
+            vrhovi.push(0, 0 , h / 2, 0, 0, 1);
             phi -= 2 * Math.PI / n;
           } // for
         
           // plašt valjka
-          phi = 0;
-          for(let i = 0; i <= n; i++) {
-            let c = Math.cos(phi);
-            let s = Math.sin(phi);
+          let iPrevious = 0;
+          for(let i = 0; i <= 2*Math.PI; i+=(2*Math.PI)/n) {
+            let cPrevious = Math.cos(iPrevious);
+            let sPrevious = Math.sin(iPrevious);
+            let xPrevious = r * c;
+            let yPrevious = r * s;
+
+            let c = Math.cos(i);
+            let s = Math.sin(i);
             let x = r * c;
             let y = r * s;
+
+
+            // let vektor1 = [
+            //   x - xCurrentMeridianPreviousParallel, 
+            //   y - yCurrentMeridianPreviousParallel, 
+            //   z - zCurrentMeridianPreviousParallel
+            // ]
+
+            // let vektor2 = [
+            //   xPreviousMeridian - xCurrentMeridianPreviousParallel, 
+            //   yPreviousMeridian - yCurrentMeridianPreviousParallel, 
+            //   zPreviousMeridian - zCurrentMeridianPreviousParallel
+            // ]
+
+            // let normala = mt3d.vektorskiProdukt(vektor1,vektor2)
+
             vrhovi.push(x, y, -h / 2, c, s, 0);
-            vrhovi.push(x, y, h / 2, c, s, 0);
-            phi += 2 * Math.PI / n;
+            vrhovi.push(0, 0, h / 2, c, s, 0);
+            iPrevious = i;
           } // for
 
           console.log("vrhovi.length: ", vrhovi.length);
@@ -119,13 +140,13 @@
             smijer = false;
           else if (smijer == 0)
             smijer = true
-          korak = smijer ? (korak + 0.01) : (korak - 0.01)
+          // korak = smijer ? (korak + 0.01) : (korak - 0.01)
 
-          let x = Math.sin(korak)
+          let x = -Math.sin(korak)
           let y = 0;
-          let z = Math.sin(korak)
+          let z = -Math.sin(korak)
 
-          gl.uniform3fv(GPUprog1.u_izvorXYZ, [x,y,z]);
+          gl.uniform3fv(GPUprog1.u_izvorXYZ, [-1,0,-1]);
 
 
           // matrica transformacije - rotacija oko x osi za kut alpha

@@ -77,7 +77,7 @@
           vrhovi.push(0, 0, h / 2, 0, 0, 1); // središte za TRIANGLE_FAN
           phi = 2 * Math.PI;
           for(let i = 0; i <= n; i++) {
-            vrhovi.push(r * Math.cos(phi), r * Math.sin(phi), h / 2, 0, 0, 1);
+            vrhovi.push(0, 0 , h / 2, 0, 0, 1);
             phi -= 2 * Math.PI / n;
           } // for
         
@@ -89,7 +89,7 @@
             let x = r * c;
             let y = r * s;
             vrhovi.push(x, y, -h / 2, c, s, 0);
-            vrhovi.push(x, y, h / 2, c, s, 0);
+            vrhovi.push(0, 0, h / 2, c, s, 0);
             phi += 2 * Math.PI / n;
           } // for
 
@@ -119,13 +119,13 @@
             smijer = false;
           else if (smijer == 0)
             smijer = true
-          korak = smijer ? (korak + 0.01) : (korak - 0.01)
+          // korak = smijer ? (korak + 0.01) : (korak - 0.01)
 
-          let x = Math.sin(korak)
+          let x = -Math.sin(korak)
           let y = 0;
-          let z = Math.sin(korak)
+          let z = -Math.sin(korak)
 
-          gl.uniform3fv(GPUprog1.u_izvorXYZ, [x,y,z]);
+          gl.uniform3fv(GPUprog1.u_izvorXYZ, [-1,0,-1]);
 
 
           // matrica transformacije - rotacija oko x osi za kut alpha

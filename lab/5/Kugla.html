@@ -36,7 +36,7 @@
 				let a = 1
 				persp.clear()
 
-				korak = (korak + 0.01)%(2*Math.PI)
+				// korak = (korak + 0.001)%(2*Math.PI)
 				// visina = (visina + 0.001)%(2*Math.PI)
 
 				kameraX = 5*Math.cos(korak)
@@ -52,9 +52,9 @@
 				floor(a)
 				mt3d.identitet()
 				persp.trans(mt3d)
-				persp.kugla(2,10,10)
+				persp.kugla(2,3,3)
 			
-				requestAnimationFrame(rotirajuciStozac)
+				// requestAnimationFrame(rotirajuciStozac)
 			}
 
 			function floor(a)
