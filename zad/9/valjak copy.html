@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="hr"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="UTF-8">
+		<title>Lambert i refleksija</title>
+		<script src="RG-WebGL.js"></script>
+
+		<script>
+		  window.onload = WebGL2aplikacija;
+
+		  function WebGL2aplikacija() {
+        var platno1 = document.getElementById("slika1");
+        gl = platno1.getContext("webgl2");
+        if (!gl) alert("WebGL2 nije dostupan!");
+
+        var GPUprog1 = pripremiGPUprogram(gl, "vertex-shader", "fragment-shader");
+        gl.useProgram(GPUprog1); // možemo imati više GPU programa
+
+        // povezivanje s uniform varijablama u programu za sjenčanje
+        GPUprog1.u_mTrans = gl.getUniformLocation(GPUprog1, "u_mTrans");
+        GPUprog1.u_izvorXYZ = gl.getUniformLocation(GPUprog1, "u_izvorXYZ");
+        GPUprog1.u_kameraXYZ = gl.getUniformLocation(GPUprog1, "u_kameraXYZ");
+        GPUprog1.u_boja = gl.getUniformLocation(GPUprog1, "u_boja");
+
+        function calculateNormal(vector1, vector2) {
+            // Create two vectors from the provided vectors
+            var vec1 = {x: vector1[0], y: vector1[1], z: vector1[2]};
+            var vec2 = {x: vector2[0], y: vector2[1], z: vector2[2]};
+
+            // Calculate the cross product of the two vectors
+            var normal = {
+                x: (vec1.y * vec2.z) - (vec1.z * vec2.y),
+                y: (vec1.z * vec2.x) - (vec1.x * vec2.z),
+                z: (vec1.x * vec2.y) - (vec1.y * vec2.x)
+            };
+
+            // Normalize the normal vector
+            var length = Math.sqrt((normal.x * normal.x) + (normal.y * normal.y) + (normal.z * normal.z));
+
+            normal.x /= length;
+            normal.y /= length;
+            normal.z /= length;
+
+            return [normal.x, normal.y, normal.z];
+        }
+
+        function vektorskiProdukt(u,v)
+        {
+            return [u[1]*v[2] - u[2]*v[1], u[2]*v[0] - u[0]*v[2], u[0]*v[1] - u[1]*v[0]]
+        }
+        
+        function valjak(r, h, n) {
+          var vrhovi = []; 
+
+          for(let i = - 2*Math.PI/n; i <= 2*Math.PI; i+=(2*Math.PI)/n) {
+
+            let x1 = r * Math.cos(i),
+                y1 = r * Math.sin(i),
+                z1 = -h/2;
+
+            let x12 = r * Math.cos(i),
+                y12 = r * Math.sin(i),
+                z12 = h/2;
+
+            let x2 = r * Math.cos(i+2*Math.PI/n),
+                y2 = r * Math.sin(i+2*Math.PI/n),
+                z2 = -h/2;
+
+            let x22 = r * Math.cos(i+2*Math.PI/n),
+                y22 = r * Math.sin(i+2*Math.PI/n),
+                z22 = h/2;
+
+            let vektor1 = [
+                x12 - x1, 
+                y12 - y1, 
+                z12 - z1
+            ]
+
+            let vektor2 = [
+                x1 - x2, 
+                y1 - y2, 
+                z1 - z2
+            ]
+
+            let vektor3 = [
+                0 - x22, 
+                0 - y22, 
+                h/2 - z22
+            ]
+
+            let vektor4 = [
+                x12 - x22, 
+                y12 - y22, 
+                z12 - z22
+            ]
+
+            let vektor6 = [
+                0 - x1, 
+                0 - y1, 
+                -h/2 - z1
+            ]
+
+            let vektor5 = [
+                x2 - x1, 
+                y2 - x1, 
+                z2 - x1
+            ]
+
+            let normala = calculateNormal(vektor2,vektor1)
+            let normala2 = calculateNormal(vektor3,vektor4)
+            let normala3 = calculateNormal(vektor5,vektor6)
+
+            // top
+            vrhovi.push([x12, y12, z12, normala2].flat());
+            vrhovi.push([0, 0, h / 2, normala2].flat());
+            vrhovi.push([x22, y22, z22, normala2].flat());
+
+            // bot
+            vrhovi.push([x2, y2, z2, normala3].flat());
+            vrhovi.push([0, 0, -h / 2, normala3].flat());
+            vrhovi.push([x1, y1, z1, normala3].flat());
+
+            // sides
+            vrhovi.push([x1, y1, z1, normala].flat());
+            vrhovi.push([x12, y12, z12, normala].flat());
+            vrhovi.push([x22, y22, z22, normala].flat());
+
+            vrhovi.push([x22, y22, z22, normala].flat());
+            vrhovi.push([x2, y2, z2, normala].flat());
+            vrhovi.push([x1, y1, z1, normala].flat());
+
+          } // for
+
+          console.log("vrhovi.length: ", vrhovi.length);
+          return vrhovi;
+        } // valjak
+
+        function napuniSpremnike() {
+          GPUprog1.a_vrhXYZ = gl.getAttribLocation(GPUprog1, "a_vrhXYZ");
+          GPUprog1.a_normala = gl.getAttribLocation(GPUprog1, "a_normala");
+        
+          gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+          gl.enableVertexAttribArray(GPUprog1.a_vrhXYZ);
+          gl.enableVertexAttribArray(GPUprog1.a_normala);
+          gl.vertexAttribPointer(GPUprog1.a_vrhXYZ, 3, gl.FLOAT, false, 24, 0);
+          gl.vertexAttribPointer(GPUprog1.a_normala, 3, gl.FLOAT, false, 24, 12);
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vrhovi.flat()),
+            gl.STATIC_DRAW);
+        } // napuni spremnike
+
+        function iscrtaj() {
+          gl.clearColor(0.5, 0.5, 0.5, 1);
+          gl.clear(gl.COLOR_BUFFER_BIT);
+          gl.viewport(0, 0, platno1.width, platno1.height);
+
+          if (smijer == 180)
+            smijer = false;
+          else if (smijer == 0)
+            smijer = true
+        //   korak = smijer ? (korak + 0.01) : (korak - 0.01)
+          korak = 1
+
+          let x = 1
+          let y = 1;
+          let z = 0
+
+          gl.uniform3fv(GPUprog1.u_izvorXYZ, [x,y,z]);
+
+
+          // matrica transformacije - rotacija oko x osi za kut alpha
+          gl.uniformMatrix4fv(GPUprog1.u_mTrans, false,
+            [1, 0, 0, 0,
+             0, Math.cos(alpha), Math.sin(alpha), 0,
+             0, -Math.sin(alpha), Math.cos(alpha), 0, 
+             0, 0, 0, 1]);
+
+          // gl.uniformMatrix4fv(GPUprog1.u_mTrans, false,
+          //   [1, 0, 0, 0,
+          //    0, 1, 0, 0,
+          //    0, 1, 1, 0, 
+          //    0, 0, 0, 1]);   
+
+          // donja baza valjka
+          gl.drawArrays(gl.TRIANGLES, 0, vrhovi.length);
+
+          alpha += (Math.PI / 180)/2;
+          requestAnimationFrame(iscrtaj);
+        } // iscrtaj
+        let smijer = true;
+        let korak = 0;
+        var alpha = 0; // kut rotacije koji se koristi kod animacije
+        var n = 32; // broj stranica koje čine plašt valjka
+        let vrhovi = valjak(0.5, 1, n);
+        napuniSpremnike();
+
+        // vektori položaja izvora svjetlosti i kamere
+        gl.uniform3fv(GPUprog1.u_kameraXYZ, [-10, 0, -10]);
+
+        // boja izvora u RGB formatu
+        gl.uniform3fv(GPUprog1.u_boja, [1.0, 1.0, 0.0]);
+
+        // omogući selektivno odbacivanje
+        gl.enable(gl.CULL_FACE);
+
+        iscrtaj();
+      } // WebGL2Aplikacija
+		</script>
+
+		<script id="vertex-shader" type="x-shader/x-vertex">
+      #version 300 es
+      in vec4 a_vrhXYZ;
+      in vec3 a_normala;
+      uniform mat4 u_mTrans;
+      uniform vec3 u_izvorXYZ;
+      uniform vec3 u_kameraXYZ;
+      out float v_svjetlina;
+
+      void main() {
+        vec4 vrh = u_mTrans * a_vrhXYZ; // primijeni matricu transformacije
+        vec3 normala = mat3(u_mTrans) * a_normala; // transformacija normale
+
+        // Lambertov zakon
+        vec3 premaIzvoru = normalize(u_izvorXYZ - vec3(vrh));
+        v_svjetlina = dot(premaIzvoru, normala);
+
+        // zakon refleksije
+        float refleksija = 0.0;
+        if(v_svjetlina > 0.0) {
+          vec3 premaKameri = normalize(u_kameraXYZ - vec3(vrh));
+          vec3 reflektiranaZraka = reflect(-premaIzvoru, normala);
+          refleksija = max(dot(reflektiranaZraka, premaKameri), 0.0);
+          refleksija = pow(refleksija, 8.0);
+        }
+
+        v_svjetlina = v_svjetlina * 0.5 + refleksija * 0.5;
+        gl_Position = vrh;
+      }
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+      #version 300 es
+      precision highp float;
+      uniform vec3 u_boja;
+      in float v_svjetlina;
+      out vec4 bojaFragmenta;
+
+      void main() {
+        bojaFragmenta = vec4(v_svjetlina * u_boja, 1.0); // postavlja se boja fragmenta
+      }
+    </script>
+	</head>
+
+	<body>
+		<h1>Lambert i refleksija</h1>
+		<div>
+			<canvas id="slika1" style="border:5px solid black" width="500" height="500">
+				Vaš preglednik ne podržava HTML5 canvas.
+      </canvas>
+		</div>
+	
+</body></html>

@@ -23,6 +23,42 @@
         GPUprog1.u_kameraXYZ = gl.getUniformLocation(GPUprog1, "u_kameraXYZ");
         GPUprog1.u_boja = gl.getUniformLocation(GPUprog1, "u_boja");
 
+        function valjak(r, h, n) {
+          var vrhovi = []; 
+
+          // n-terokut - donja baza valjka na z = -h / 2
+          // vektori normale su prema dolje, tj. [0, 0, -1]
+          vrhovi.push(0, 0, -h / 2, 0, 0, -1); // središte za TRIANGLE_FAN
+          let phi = 2 * Math.PI / n;
+          for(let i = 0; i <= n; i++) {
+            vrhovi.push(r * Math.cos(phi), r * Math.sin(phi), -h / 2, 0, 0, -1);
+            phi += 2 * Math.PI / n;
+          } // for
+
+          // n-terokut - gornja baza valjka na z = h / 2
+          // vektori normale su prema gore, tj. [0, 0, 1]
+          vrhovi.push(0, 0, h / 2, 0, 0, 1); // središte za TRIANGLE_FAN
+          phi = 2 * Math.PI;
+          for(let i = 0; i <= n; i++) {
+            vrhovi.push(r * Math.cos(phi), r * Math.sin(phi), h / 2, 0, 0, 1);
+            phi -= 2 * Math.PI / n;
+          } // for
+        
+          // plašt valjka
+          phi = 0;
+          for(let i = 0; i <= n; i++) {
+            let c = Math.cos(phi);
+            let s = Math.sin(phi);
+            let x = r * c;
+            let y = r * s;
+            vrhovi.push(x, y, -h / 2, c, s, 0);
+            vrhovi.push(x, y, h / 2, c, s, 0);
+            phi += 2 * Math.PI / n;
+          } // for
+
+          console.log("vrhovi.length: ", vrhovi.length);
+          return vrhovi;
+        } // valjak
 
         function calculateNormal(vector1, vector2) {
           // Create two vectors from the provided vectors
@@ -45,79 +81,6 @@
 
           return [normal.x, normal.y, normal.z];
         }
-
-        function kugla(r, m, n) {
-          var vrhovi = []; 
-
-          let thetaPrevious = 0
-          let iPrevious = 0
-          for(let theta = 0; theta <= Math.PI; theta+=Math.PI/m)
-          {
-            for(let i = 0; i <= 2*Math.PI; i+=Math.PI/n)
-            {
-              let xPreviousMeridian = r*Math.cos(iPrevious)*Math.sin(thetaPrevious)
-              let yPreviousMeridian = r*Math.sin(iPrevious)*Math.sin(thetaPrevious)
-              let zPreviousMeridian = r*Math.cos(thetaPrevious)
-
-              let xPrevious2 = r*Math.cos(iPrevious)*Math.sin(theta)
-              let yPrevious2 = r*Math.sin(iPrevious)*Math.sin(theta)
-              let zPrevious2 = r*Math.cos(theta)
-
-              // Current Meridian Previous Parallel
-              let xCurrentMeridianPreviousParallel = r*Math.cos(i)*Math.sin(thetaPrevious)
-              let yCurrentMeridianPreviousParallel = r*Math.sin(i)*Math.sin(thetaPrevious)
-              let zCurrentMeridianPreviousParallel = r*Math.cos(thetaPrevious)
-
-              x = r*Math.cos(i)*Math.sin(theta)
-              y = r*Math.sin(i)*Math.sin(theta)
-              z = r*Math.cos(theta)
-              
-              let c = Math.cos(theta);
-              let s = Math.sin(theta);
-              let w = 0;
-
-              let vektor1 = [
-                xPrevious2 - xPreviousMeridian, 
-                yPrevious2 - yPreviousMeridian, 
-                zPrevious2 - zPreviousMeridian
-              ]
-
-              let vektor2 = [
-                xPrevious2 - x, 
-                yPrevious2 - y, 
-                zPrevious2 - z
-              ]
-
-              let vektor3 = [
-                x - xCurrentMeridianPreviousParallel, 
-                y - yCurrentMeridianPreviousParallel, 
-                z - zCurrentMeridianPreviousParallel
-              ]
-
-              let vektor4 = [
-                xPreviousMeridian - xCurrentMeridianPreviousParallel, 
-                yPreviousMeridian - yCurrentMeridianPreviousParallel, 
-                zPreviousMeridian - zCurrentMeridianPreviousParallel
-              ]
-
-              let normala = calculateNormal(vektor1,vektor2)
-              let normala2 = calculateNormal(vektor3,vektor4)
-
-              vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala].flat())
-              vrhovi.push([xPrevious2,yPrevious2,zPrevious2, normala].flat())
-              vrhovi.push([x,y,z, normala].flat())
-
-              vrhovi.push([x,y,z, normala2].flat())
-              vrhovi.push([xCurrentMeridianPreviousParallel,yCurrentMeridianPreviousParallel,zCurrentMeridianPreviousParallel, normala2].flat())
-              vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala2].flat())
-              iPrevious = i;
-            }
-            thetaPrevious = theta;
-          }
-
-          console.log("vrhovi.length: ", vrhovi.length);
-          return vrhovi;
-        } // valjak
 
         function stozac(r, h, n) {
           var vrhovi = []; 
@@ -163,17 +126,17 @@
           return vrhovi;
         } // valjak
 
-
         function napuniSpremnike() {
           GPUprog1.a_vrhXYZ = gl.getAttribLocation(GPUprog1, "a_vrhXYZ");
-          GPUprog1.a_normala2 = gl.getAttribLocation(GPUprog1, "a_normala2");
+          GPUprog1.a_normala = gl.getAttribLocation(GPUprog1, "a_normala");
         
           gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
           gl.enableVertexAttribArray(GPUprog1.a_vrhXYZ);
-          gl.enableVertexAttribArray(GPUprog1.a_normala2);
+          gl.enableVertexAttribArray(GPUprog1.a_normala);
           gl.vertexAttribPointer(GPUprog1.a_vrhXYZ, 3, gl.FLOAT, false, 24, 0);
-          gl.vertexAttribPointer(GPUprog1.a_normala2, 3, gl.FLOAT, false, 24, 12);
-          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vrhovi.flat()), gl.STATIC_DRAW);
+          gl.vertexAttribPointer(GPUprog1.a_normala, 3, gl.FLOAT, false, 24, 12);
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vrhovi.flat()),
+            gl.STATIC_DRAW);
         } // napuni spremnike
 
         function iscrtaj() {
@@ -181,48 +144,49 @@
           gl.clear(gl.COLOR_BUFFER_BIT);
           gl.viewport(0, 0, platno1.width, platno1.height);
 
+          // if (smijer == 180)
+          //   smijer = false;
+          // else if (smijer == 0)
+          //   smijer = true
+          // korak = smijer ? (korak + 0.01) : (korak - 0.01)
 
-          if (smijer == 180)
-            smijer = false;
-          else if (smijer == 0)
-            smijer = true
-          korak = smijer ? (korak + 0.01) : (korak - 0.01)
-
-          let x = Math.sin(korak);
-          let y = Math.cos(korak);;
+          let x = 1;
+          let y = 1;
           let z = -1;
 
           gl.uniform3fv(GPUprog1.u_izvorXYZ, [x,y,z]);
+
 
           // matrica transformacije - rotacija oko x osi za kut alpha
           gl.uniformMatrix4fv(GPUprog1.u_mTrans, false,
             [1, 0, 0, 0,
              0, Math.cos(alpha), Math.sin(alpha), 0,
              0, -Math.sin(alpha), Math.cos(alpha), 0, 
-             0, 0, 0, 1]);
+             0, 0, 0, 1]);3
 
           // donja baza valjka
+          // gl.drawArrays(gl.TRIANGLE_FAN, 0, n + 2);
+
           gl.drawArrays(gl.TRIANGLES, 0, vrhovi.length);
+
 
           alpha += (Math.PI / 180)/2;
           requestAnimationFrame(iscrtaj);
         } // iscrtaj
 
+        let mt3d = new MT3D();
         let smijer = true;
         let korak = 0;
         var alpha = 0; // kut rotacije koji se koristi kod animacije
         var n = 32; // broj stranica koje čine plašt valjka
-        let mt3d = new MT3D();
-        let vrhovi = kugla(0.5, 35, 32);
+        let vrhovi = stozac(0.5,1,n);
         napuniSpremnike();
 
         // vektori položaja izvora svjetlosti i kamere
-        gl.uniform3fv(GPUprog1.u_kameraXYZ, [-10, 0, -10]);
+        gl.uniform3fv(GPUprog1.u_kameraXYZ, [0, 0, -10]);
 
         // boja izvora u RGB formatu
         gl.uniform3fv(GPUprog1.u_boja, [1.0, 1.0, 0.0]);
-
-        
 
         // omogući selektivno odbacivanje
         gl.enable(gl.CULL_FACE);
@@ -234,7 +198,7 @@
 		<script id="vertex-shader" type="x-shader/x-vertex">
       #version 300 es
       in vec4 a_vrhXYZ;
-      in vec3 a_normala2;
+      in vec3 a_normala;
       uniform mat4 u_mTrans;
       uniform vec3 u_izvorXYZ;
       uniform vec3 u_kameraXYZ;
@@ -242,17 +206,17 @@
 
       void main() {
         vec4 vrh = u_mTrans * a_vrhXYZ; // primijeni matricu transformacije
-        vec3 normala2 = mat3(u_mTrans) * a_normala2; // transformacija normale
+        vec3 normala = mat3(u_mTrans) * a_normala; // transformacija normale
 
         // Lambertov zakon
         vec3 premaIzvoru = normalize(u_izvorXYZ - vec3(vrh));
-        v_svjetlina = dot(premaIzvoru, normala2);
+        v_svjetlina = dot(premaIzvoru, normala);
 
         // zakon refleksije
         float refleksija = 0.0;
         if(v_svjetlina > 0.0) {
           vec3 premaKameri = normalize(u_kameraXYZ - vec3(vrh));
-          vec3 reflektiranaZraka = reflect(-premaIzvoru, normala2);
+          vec3 reflektiranaZraka = reflect(-premaIzvoru, normala);
           refleksija = max(dot(reflektiranaZraka, premaKameri), 0.0);
           refleksija = pow(refleksija, 8.0);
         }
