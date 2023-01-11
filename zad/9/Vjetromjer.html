@@ -67,7 +67,6 @@
     let korak = 0;
     let visina = 0;
     let a = 1;
-    let brid = a/2
 
     let xMax = yMax = 5, zMax = 20;
     let xMin = yMin = -5, zMin = 2;
@@ -86,12 +85,19 @@
 
       mt3d = new MT3D();
 
-      GPUprogram1.floorVAO = napuniSpremnike(floorY());
-      GPUprogram1.kockaVAO = napuniSpremnike(kocka());
-      GPUprogram1.polusferaVAO = napuniSpremnike(kocka());
-      GPUprogram1.stozacVAO = napuniSpremnike(kocka());
-      GPUprogram1.valjakVAO = napuniSpremnike(kocka());
-      GPUprogram1.valjakVAO = napuniSpremnike(kocka());
+      // vrhovi za objekte
+      GPUprogram1.floorVrhovi = mt3d.floorY(xMin, xMax, yMin, yMax, zMin, zMax, a/2),
+      GPUprogram1.polukuglaVrhovi = mt3d.polukugla(),
+      GPUprogram1.stozacVrhovi = mt3d.stozac(0.5,2,34),
+      GPUprogram1.valjakVrhovi1 = mt3d.valjak(),
+      GPUprogram1.valjakVrhovi2 = mt3d.valjak();
+      
+      // VAO za objekte
+      GPUprogram1.floorVAO = napuniSpremnike(GPUprogram1.floorVrhovi);
+      GPUprogram1.polukuglaVAO = napuniSpremnike(GPUprogram1.polukuglaVrhovi);
+      GPUprogram1.stozacVAO = napuniSpremnike(GPUprogram1.stozacVrhovi);
+      GPUprogram1.valjakVAO1 = napuniSpremnike(GPUprogram1.valjakVrhovi1);
+      GPUprogram1.valjakVAO2 = napuniSpremnike(GPUprogram1.valjakVrhovi2);
 
       postaviSvjetlo()
 
@@ -166,142 +172,20 @@
       mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
       mt3d.transKamera();
 
-      iscrtaj(floorY(), gl.LINE_STRIP, GPUprogram1.floorVAO)
+      iscrtaj(GPUprogram1.floorVrhovi, gl.LINE_STRIP, GPUprogram1.floorVAO)
       f()
       requestAnimationFrame(crtajSliku)
     }
-
+    
+    // funkcija za crtanje vjetromjera
     function vjetromjer()
     {
 
     }
     function f()
     {
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
+      iscrtaj(GPUprogram1.stozacVrhovi, gl.TRIANGLES, GPUprogram1.kockaVAO)
 
-      mt3d.pomakni(0,0,a)
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
-
-      mt3d.pomakni(0,a,0)
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
-      
-      mt3d.pomakni(0,-a,a)
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
-      
-      mt3d.pomakni(0,0,a)
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
-
-
-      mt3d.pomakni(0,a,0)
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
-
-      mt3d.pomakni(0,a,0)
-      iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)
-      
-    }
-    function floorY()
-    { 
-      GPUprogram1.floor = []
-      
-      if(GPUprogram1.floor.length == 0)
-      {
-        for(let i = yMin; i <= yMax; i++)
-        {
-          GPUprogram1.floor.push(
-            [xMax, i, -brid, 0, 1, 0,  1, 1, 1],
-            [xMin, i, -brid, 0, 1, 0,  1, 1, 1],
-            [xMax, i, -brid, 0, 1, 0,  1, 1, 1],
-          )
-        }
-        for(let i = xMin; i <= xMax; i++)
-        {
-          GPUprogram1.floor.push(
-            [i, yMax, -brid, 0, 1, 0,  0, 0, 0],
-            [i, yMin, -brid, 0, 1, 0,  0, 0, 0],
-            [i, yMax, -brid, 0, 1, 0,  0, 0, 0],
-          )
-        }
-      }
-      return GPUprogram1.floor;
-    }
-
-    function floor()
-    { 
-      GPUprogram1.floor = []
-      
-      if(GPUprogram1.floor.length == 0)
-      {
-        for(let i = zMin; i <= zMax; i++)
-        {
-          GPUprogram1.floor.push(
-            [xMin, -brid, brid, 0, 1, 0],
-            [xMax, -brid, brid, 0, 1, 0],
-            [xMin, -brid, brid, 0, 1, 0],
-          )
-        }
-        for(let i = xMin; i <= xMax; i++)
-        {
-          GPUprogram1.floor.push(
-            [brid, -brid, zMin, 0, 1, 0],
-            [brid, -brid, zMax, 0, 1, 0],
-            [brid, -brid, zMin, 0, 1, 0]
-          )
-        }
-      }
-      return GPUprogram1.floor;
-    }
-
-    function kocka()
-    {
-      return [
-        // front but in persp bot  
-        [-brid, brid, -brid,   0, 1, 0,   0, 0, -1],
-        [brid, -brid, -brid,   0, 1, 0,   0, 0, -1],
-        [-brid, -brid, -brid,  0, 1, 0,   0, 0, -1],
-        [brid, -brid, -brid,   0, 1, 0,   0, 0, -1],
-        [-brid, brid, -brid,   0, 1, 0,   0, 0, -1],
-        [brid, brid, -brid,    0, 1, 0,   0, 0, -1],
-        
-        // left  but in persp back
-        [-brid, brid, -brid,   1, 0, 0,   -1, 0, 0],
-        [-brid, -brid, brid,   1, 0, 0,   -1, 0, 0],
-        [-brid, brid, brid,    1, 0, 0,   -1, 0, 0],
-        [-brid, -brid, brid,   1, 0, 0,   -1, 0, 0],
-        [-brid, brid, -brid,   1, 0, 0,   -1, 0, 0],
-        [-brid, -brid, -brid,  1, 0, 0,   -1, 0, 0],
-  
-        // bot  but in persp left
-        [-brid, -brid, -brid,  0, 0, 0,   0, -1, 0],
-        [brid, -brid, brid,    0, 0, 0,   0, -1, 0],
-        [-brid, -brid, brid,   0, 0, 0,   0, -1, 0],
-        [brid, -brid, brid,    0, 0, 0,   0, -1, 0],
-        [-brid, -brid, -brid,  0, 0, 0,   0, -1, 0],
-        [brid, -brid, -brid,   0, 0, 0,   0, -1, 0],
-  
-        // right  but in persp front
-        [brid, -brid, -brid,   0, 0, 1,   1, 0, 0],
-        [brid, brid, brid,     0, 0, 1,   1, 0, 0],
-        [brid, -brid, brid,    0, 0, 1,   1, 0, 0],
-        [brid, brid, brid,     0, 0, 1,   1, 0, 0],
-        [brid, -brid, -brid,   0, 0, 1,   1, 0, 0],
-        [brid, brid, -brid,    0, 0, 1,   1, 0, 0],
-  
-        // back  but in persp top
-        [brid, -brid, brid,    1, 1, 1,   0, 0, 1],
-        [-brid, brid, brid,    1, 1, 1,   0, 0, 1],
-        [-brid, -brid, brid,   1, 1, 1,   0, 0, 1],
-        [-brid, brid, brid,    1, 1, 1,   0, 0, 1],
-        [brid, -brid, brid,    1, 1, 1,   0, 0, 1],
-        [brid, brid, brid,     1, 1, 1,   0, 0, 1],
-  
-        // top  but in persp right
-        [brid, brid, brid,     1, 0, 1,   0, 1, 0],
-        [-brid, brid, -brid,   1, 0, 1,   0, 1, 0],
-        [-brid, brid, brid,    1, 0, 1,   0, 1, 0],
-        [-brid, brid, -brid,   1, 0, 1,   0, 1, 0],
-        [brid, brid, brid,     1, 0, 1,   0, 1, 0],
-        [brid, brid, -brid,    1, 0, 1,   0, 1, 0],
-      ];
     }
 	</script>
 	</head>

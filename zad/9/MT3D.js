@@ -345,7 +345,6 @@ class MT3D {
         return [normal.x, normal.y, normal.z];
     }
 
-
     kugla(r, m, n) {
         var vrhovi = []; 
 
@@ -442,13 +441,9 @@ class MT3D {
             let yCurrentMeridianPreviousParallel = r*Math.sin(i)*Math.sin(thetaPrevious)
             let zCurrentMeridianPreviousParallel = r*Math.cos(thetaPrevious)
 
-            x = r*Math.cos(i)*Math.sin(theta)
-            y = r*Math.sin(i)*Math.sin(theta)
-            z = r*Math.cos(theta)
-            
-            let c = Math.cos(theta);
-            let s = Math.sin(theta);
-            let w = 0;
+            let x = r*Math.cos(i)*Math.sin(theta),
+                y = r*Math.sin(i)*Math.sin(theta),
+                z = r*Math.cos(theta)
 
             let vektor1 = [
               xPrevious2 - xPreviousMeridian, 
@@ -486,11 +481,11 @@ class MT3D {
               zCurrentMeridianPreviousParallel - zPreviousMeridian
             ]
 
-            let normala = calculateNormal(vektor1,vektor2)
-            let normala2 = calculateNormal(vektor3,vektor4)
+            let normala = this.calculateNormal(vektor1,vektor2)
+            let normala2 = this.calculateNormal(vektor3,vektor4)
 
-            let normalaInvers = calculateNormal(vektor1,vektor2Invers)
-            let normala2Invers = calculateNormal(vektor3,vektor4Invers)
+            let normalaInvers = this.calculateNormal(vektor1,vektor2Invers)
+            let normala2Invers = this.calculateNormal(vektor3,vektor4Invers)
 
             // vanjstina
             vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala].flat())
@@ -518,7 +513,6 @@ class MT3D {
         console.log("vrhovi.length: ", vrhovi.length);
         return vrhovi;
     }
-
 
     stozac(r, h, n) {
         var vrhovi = []; 
@@ -637,58 +631,109 @@ class MT3D {
         console.log("vrhovi.length: ", vrhovi.length);
         return vrhovi;
     } // valjak
-    
 
-    kocka()
+    kocka(brid)
     {
       return [
         // front but in persp bot  
-        [-brid, brid, -brid,   0, 1, 0,   0, -1, 0],
-        [brid, -brid, -brid,   0, 1, 0,   0, -1, 0],
-        [-brid, -brid, -brid,  0, 1, 0,   0, -1, 0],
-        [brid, -brid, -brid,   0, 1, 0,   0, -1, 0],
-        [-brid, brid, -brid,   0, 1, 0,   0, -1, 0],
-        [brid, brid, -brid,    0, 1, 0,   0, -1, 0],
+        [-brid, brid, -brid,   0, 1, 0,   0, 0, -1],
+        [brid, -brid, -brid,   0, 1, 0,   0, 0, -1],
+        [-brid, -brid, -brid,  0, 1, 0,   0, 0, -1],
+        [brid, -brid, -brid,   0, 1, 0,   0, 0, -1],
+        [-brid, brid, -brid,   0, 1, 0,   0, 0, -1],
+        [brid, brid, -brid,    0, 1, 0,   0, 0, -1],
         
         // left  but in persp back
-        [-brid, brid, -brid,   1, 0, 0,   0, 0, 0],
-        [-brid, -brid, brid,   1, 0, 0,   0, 0, 0],
-        [-brid, brid, brid,    1, 0, 0,   0, 0, 0],
-        [-brid, -brid, brid,   1, 0, 0,   0, 0, 0],
-        [-brid, brid, -brid,   1, 0, 0,   0, 0, 0],
-        [-brid, -brid, -brid,  1, 0, 0,   0, 0, 0],
+        [-brid, brid, -brid,   1, 0, 0,   -1, 0, 0],
+        [-brid, -brid, brid,   1, 0, 0,   -1, 0, 0],
+        [-brid, brid, brid,    1, 0, 0,   -1, 0, 0],
+        [-brid, -brid, brid,   1, 0, 0,   -1, 0, 0],
+        [-brid, brid, -brid,   1, 0, 0,   -1, 0, 0],
+        [-brid, -brid, -brid,  1, 0, 0,   -1, 0, 0],
   
         // bot  but in persp left
-        [-brid, -brid, -brid,  0, 0, 0,   1, 1, 1],
-        [brid, -brid, brid,    0, 0, 0,   1, 1, 1],
-        [-brid, -brid, brid,   0, 0, 0,   1, 1, 1],
-        [brid, -brid, brid,    0, 0, 0,   1, 1, 1],
-        [-brid, -brid, -brid,  0, 0, 0,   1, 1, 1],
-        [brid, -brid, -brid,   0, 0, 0,   1, 1, 1],
+        [-brid, -brid, -brid,  0, 0, 0,   0, -1, 0],
+        [brid, -brid, brid,    0, 0, 0,   0, -1, 0],
+        [-brid, -brid, brid,   0, 0, 0,   0, -1, 0],
+        [brid, -brid, brid,    0, 0, 0,   0, -1, 0],
+        [-brid, -brid, -brid,  0, 0, 0,   0, -1, 0],
+        [brid, -brid, -brid,   0, 0, 0,   0, -1, 0],
   
         // right  but in persp front
-        [brid, -brid, -brid,   0, 0, 1,   0, 0, 0],
-        [brid, brid, brid,     0, 0, 1,   0, 0, 0],
-        [brid, -brid, brid,    0, 0, 1,   0, 0, 0],
-        [brid, brid, brid,     0, 0, 1,   0, 0, 0],
-        [brid, -brid, -brid,   0, 0, 1,   0, 0, 0],
-        [brid, brid, -brid,    0, 0, 1,   0, 0, 0],
+        [brid, -brid, -brid,   0, 0, 1,   1, 0, 0],
+        [brid, brid, brid,     0, 0, 1,   1, 0, 0],
+        [brid, -brid, brid,    0, 0, 1,   1, 0, 0],
+        [brid, brid, brid,     0, 0, 1,   1, 0, 0],
+        [brid, -brid, -brid,   0, 0, 1,   1, 0, 0],
+        [brid, brid, -brid,    0, 0, 1,   1, 0, 0],
   
         // back  but in persp top
-        [brid, -brid, brid,    1, 1, 1,   0, 1, 1],
-        [-brid, brid, brid,    1, 1, 1,   0, 1, 1],
-        [-brid, -brid, brid,   1, 1, 1,   0, 1, 1],
-        [-brid, brid, brid,    1, 1, 1,   0, 1, 1],
-        [brid, -brid, brid,    1, 1, 1,   0, 1, 1],
-        [brid, brid, brid,     1, 1, 1,   0, 1, 1],
+        [brid, -brid, brid,    1, 1, 1,   0, 0, 1],
+        [-brid, brid, brid,    1, 1, 1,   0, 0, 1],
+        [-brid, -brid, brid,   1, 1, 1,   0, 0, 1],
+        [-brid, brid, brid,    1, 1, 1,   0, 0, 1],
+        [brid, -brid, brid,    1, 1, 1,   0, 0, 1],
+        [brid, brid, brid,     1, 1, 1,   0, 0, 1],
   
         // top  but in persp right
-        [brid, brid, brid,     1, 0, 1,   1, 1, 1],
-        [-brid, brid, -brid,   1, 0, 1,   1, 1, 1],
-        [-brid, brid, brid,    1, 0, 1,   1, 1, 1],
-        [-brid, brid, -brid,   1, 0, 1,   1, 1, 1],
-        [brid, brid, brid,     1, 0, 1,   1, 1, 1],
-        [brid, brid, -brid,    1, 0, 1,   1, 1, 1],
+        [brid, brid, brid,     1, 0, 1,   0, 1, 0],
+        [-brid, brid, -brid,   1, 0, 1,   0, 1, 0],
+        [-brid, brid, brid,    1, 0, 1,   0, 1, 0],
+        [-brid, brid, -brid,   1, 0, 1,   0, 1, 0],
+        [brid, brid, brid,     1, 0, 1,   0, 1, 0],
+        [brid, brid, -brid,    1, 0, 1,   0, 1, 0],
       ];
+    }
+
+    floorY(xMin, xMax, yMin, yMax, zMin, zMax, brid)
+    { 
+      let floor = []
+      
+      if(floor.length == 0)
+      {
+        for(let i = yMin; i <= yMax; i++)
+        {
+          floor.push(
+            [xMax, i, -brid, 0, 1, 0,  1, 1, 1],
+            [xMin, i, -brid, 0, 1, 0,  1, 1, 1],
+            [xMax, i, -brid, 0, 1, 0,  1, 1, 1],
+          )
+        }
+        for(let i = xMin; i <= xMax; i++)
+        {
+          floor.push(
+            [i, yMax, -brid, 0, 1, 0,  0, 0, 0],
+            [i, yMin, -brid, 0, 1, 0,  0, 0, 0],
+            [i, yMax, -brid, 0, 1, 0,  0, 0, 0],
+          )
+        }
+      }
+      return floor;
+    }
+
+    floor(xMin, xMax, yMin, yMax, zMin, zMax, brid)
+    { 
+      let floor = []
+      
+      if(floor.length == 0)
+      {
+        for(let i = zMin; i <= zMax; i++)
+        {
+          floor.push(
+            [xMin, -brid, brid, 0, 1, 0],
+            [xMax, -brid, brid, 0, 1, 0],
+            [xMin, -brid, brid, 0, 1, 0],
+          )
+        }
+        for(let i = xMin; i <= xMax; i++)
+        {
+          floor.push(
+            [brid, -brid, zMin, 0, 1, 0],
+            [brid, -brid, zMax, 0, 1, 0],
+            [brid, -brid, zMin, 0, 1, 0]
+          )
+        }
+      }
+      return floor;
     }
 }
