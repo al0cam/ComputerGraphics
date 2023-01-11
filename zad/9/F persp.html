@@ -88,6 +88,10 @@
 
       GPUprogram1.floorVAO = napuniSpremnike(floorY());
       GPUprogram1.kockaVAO = napuniSpremnike(kocka());
+      GPUprogram1.polusferaVAO = napuniSpremnike(kocka());
+      GPUprogram1.stozacVAO = napuniSpremnike(kocka());
+      GPUprogram1.valjakVAO = napuniSpremnike(kocka());
+      GPUprogram1.valjakVAO = napuniSpremnike(kocka());
 
       postaviSvjetlo()
 
@@ -149,9 +153,12 @@
 
       korak = (korak + 0.01)%(2*Math.PI)
 
-      let kameraX = Math.cos(korak)*6;
-      let kameraY = Math.sin(korak)*6;
-      let  kameraZ = 1
+      // let kameraX = Math.cos(korak)*6,
+      //     kameraY = Math.sin(korak)*6,
+      //     kameraZ = 1
+      let kameraX = 4,
+          kameraY = 3,
+          kameraZ = 3
       
 
       mt3d.persp(xMin, xMax, yMin, yMax, zMin, zMax)
@@ -164,6 +171,10 @@
       requestAnimationFrame(crtajSliku)
     }
 
+    function vjetromjer()
+    {
+
+    }
     function f()
     {
       iscrtaj(kocka(), gl.TRIANGLES, GPUprogram1.kockaVAO)

@@ -46,12 +46,17 @@
           return [normal.x, normal.y, normal.z];
         }
 
+        function invertArray(array)
+        {
+          return array.map(item => -item)
+        }
+
         function kugla(r, m, n) {
           var vrhovi = []; 
 
           let thetaPrevious = 0
           let iPrevious = 0
-          for(let theta = 0; theta <= Math.PI; theta+=Math.PI/m)
+          for(let theta = 0; theta <= Math.PI/2; theta+=Math.PI/m)
           {
             for(let i = 0; i <= 2*Math.PI; i+=Math.PI/n)
             {
@@ -88,6 +93,12 @@
                 zPrevious2 - z
               ]
 
+              let vektor2Invers = [
+                x - xPrevious2, 
+                y - yPrevious2, 
+                z - zPrevious2
+              ]
+
               let vektor3 = [
                 x - xCurrentMeridianPreviousParallel, 
                 y - yCurrentMeridianPreviousParallel, 
@@ -100,9 +111,19 @@
                 zPreviousMeridian - zCurrentMeridianPreviousParallel
               ]
 
+              let vektor4Invers = [
+                xCurrentMeridianPreviousParallel - xPreviousMeridian, 
+                yCurrentMeridianPreviousParallel - yPreviousMeridian, 
+                zCurrentMeridianPreviousParallel - zPreviousMeridian
+              ]
+
               let normala = calculateNormal(vektor1,vektor2)
               let normala2 = calculateNormal(vektor3,vektor4)
 
+              let normalaInvers = calculateNormal(vektor1,vektor2Invers)
+              let normala2Invers = calculateNormal(vektor3,vektor4Invers)
+
+              // vanjstina
               vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala].flat())
               vrhovi.push([xPrevious2,yPrevious2,zPrevious2, normala].flat())
               vrhovi.push([x,y,z, normala].flat())
@@ -110,6 +131,16 @@
               vrhovi.push([x,y,z, normala2].flat())
               vrhovi.push([xCurrentMeridianPreviousParallel,yCurrentMeridianPreviousParallel,zCurrentMeridianPreviousParallel, normala2].flat())
               vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala2].flat())
+
+              // unutrasnjost
+              vrhovi.push([x,y,z, normalaInvers].flat())
+              vrhovi.push([xPrevious2, yPrevious2, zPrevious2, normalaInvers].flat())
+              vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normalaInvers].flat())
+
+              vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala2Invers].flat())
+              vrhovi.push([xCurrentMeridianPreviousParallel,yCurrentMeridianPreviousParallel,zCurrentMeridianPreviousParallel, normala2Invers].flat())
+              vrhovi.push([x,y,z, normala2Invers].flat())
+
               iPrevious = i;
             }
             thetaPrevious = theta;
@@ -226,6 +257,7 @@
 
         // omogući selektivno odbacivanje
         gl.enable(gl.CULL_FACE);
+        gl.enable(gl.DEPTH_TEST);
 
         iscrtaj();
       } // WebGL2Aplikacija

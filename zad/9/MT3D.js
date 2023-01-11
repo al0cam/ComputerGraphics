@@ -418,6 +418,106 @@ class MT3D {
         console.log("vrhovi.length: ", vrhovi.length);
         return vrhovi;
     } // valjak
+    
+    polukugla(r, m, n) {
+        
+        var vrhovi = []; 
+
+        let thetaPrevious = 0
+        let iPrevious = 0
+        for(let theta = 0; theta <= Math.PI/2; theta+=Math.PI/m)
+        {
+          for(let i = 0; i <= 2*Math.PI; i+=Math.PI/n)
+          {
+            let xPreviousMeridian = r*Math.cos(iPrevious)*Math.sin(thetaPrevious)
+            let yPreviousMeridian = r*Math.sin(iPrevious)*Math.sin(thetaPrevious)
+            let zPreviousMeridian = r*Math.cos(thetaPrevious)
+
+            let xPrevious2 = r*Math.cos(iPrevious)*Math.sin(theta)
+            let yPrevious2 = r*Math.sin(iPrevious)*Math.sin(theta)
+            let zPrevious2 = r*Math.cos(theta)
+
+            // Current Meridian Previous Parallel
+            let xCurrentMeridianPreviousParallel = r*Math.cos(i)*Math.sin(thetaPrevious)
+            let yCurrentMeridianPreviousParallel = r*Math.sin(i)*Math.sin(thetaPrevious)
+            let zCurrentMeridianPreviousParallel = r*Math.cos(thetaPrevious)
+
+            x = r*Math.cos(i)*Math.sin(theta)
+            y = r*Math.sin(i)*Math.sin(theta)
+            z = r*Math.cos(theta)
+            
+            let c = Math.cos(theta);
+            let s = Math.sin(theta);
+            let w = 0;
+
+            let vektor1 = [
+              xPrevious2 - xPreviousMeridian, 
+              yPrevious2 - yPreviousMeridian, 
+              zPrevious2 - zPreviousMeridian
+            ]
+
+            let vektor2 = [
+              xPrevious2 - x, 
+              yPrevious2 - y, 
+              zPrevious2 - z
+            ]
+
+            let vektor2Invers = [
+              x - xPrevious2, 
+              y - yPrevious2, 
+              z - zPrevious2
+            ]
+
+            let vektor3 = [
+              x - xCurrentMeridianPreviousParallel, 
+              y - yCurrentMeridianPreviousParallel, 
+              z - zCurrentMeridianPreviousParallel
+            ]
+
+            let vektor4 = [
+              xPreviousMeridian - xCurrentMeridianPreviousParallel, 
+              yPreviousMeridian - yCurrentMeridianPreviousParallel, 
+              zPreviousMeridian - zCurrentMeridianPreviousParallel
+            ]
+
+            let vektor4Invers = [
+              xCurrentMeridianPreviousParallel - xPreviousMeridian, 
+              yCurrentMeridianPreviousParallel - yPreviousMeridian, 
+              zCurrentMeridianPreviousParallel - zPreviousMeridian
+            ]
+
+            let normala = calculateNormal(vektor1,vektor2)
+            let normala2 = calculateNormal(vektor3,vektor4)
+
+            let normalaInvers = calculateNormal(vektor1,vektor2Invers)
+            let normala2Invers = calculateNormal(vektor3,vektor4Invers)
+
+            // vanjstina
+            vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala].flat())
+            vrhovi.push([xPrevious2,yPrevious2,zPrevious2, normala].flat())
+            vrhovi.push([x,y,z, normala].flat())
+
+            vrhovi.push([x,y,z, normala2].flat())
+            vrhovi.push([xCurrentMeridianPreviousParallel,yCurrentMeridianPreviousParallel,zCurrentMeridianPreviousParallel, normala2].flat())
+            vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala2].flat())
+
+            // unutrasnjost
+            vrhovi.push([x,y,z, normalaInvers].flat())
+            vrhovi.push([xPrevious2, yPrevious2, zPrevious2, normalaInvers].flat())
+            vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normalaInvers].flat())
+
+            vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala2Invers].flat())
+            vrhovi.push([xCurrentMeridianPreviousParallel,yCurrentMeridianPreviousParallel,zCurrentMeridianPreviousParallel, normala2Invers].flat())
+            vrhovi.push([x,y,z, normala2Invers].flat())
+
+            iPrevious = i;
+          }
+          thetaPrevious = theta;
+        }
+
+        console.log("vrhovi.length: ", vrhovi.length);
+        return vrhovi;
+    }
 
 
     stozac(r, h, n) {
