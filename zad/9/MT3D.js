@@ -325,27 +325,27 @@ class MT3D {
 
     calculateNormal(vector1, vector2) {
         // Create two vectors from the provided vectors
-        var vec1 = {x: vector1[0], y: vector1[1], z: vector1[2]};
-        var vec2 = {x: vector2[0], y: vector2[1], z: vector2[2]};
+        var vec1 = {x4: vector1[0], y4: vector1[1], z4: vector1[2]};
+        var vec2 = {x4: vector2[0], y4: vector2[1], z4: vector2[2]};
 
         // Calculate the cross product of the two vectors
         var normal = {
-            x: (vec1.y * vec2.z) - (vec1.z * vec2.y),
-            y: (vec1.z * vec2.x) - (vec1.x * vec2.z),
-            z: (vec1.x * vec2.y) - (vec1.y * vec2.x)
+            x4: (vec1.y4 * vec2.z4) - (vec1.z4 * vec2.y4),
+            y4: (vec1.z4 * vec2.x4) - (vec1.x4 * vec2.z4),
+            z4: (vec1.x4 * vec2.y4) - (vec1.y4 * vec2.x4)
         };
 
         // Normalize the normal vector
-        var length = Math.sqrt((normal.x * normal.x) + (normal.y * normal.y) + (normal.z * normal.z));
+        var length = Math.sqrt((normal.x4 * normal.x4) + (normal.y4 * normal.y4) + (normal.z4 * normal.z4));
 
-        normal.x /= length;
-        normal.y /= length;
-        normal.z /= length;
+        normal.x4 /= length;
+        normal.y4 /= length;
+        normal.z4 /= length;
 
-        return [normal.x, normal.y, normal.z];
+        return [normal.x4, normal.y4, normal.z4];
     }
 
-    kugla(r, m, n) {
+    kugla(r, m, n, boja=[0,0,0]) {
         var vrhovi = []; 
 
         let thetaPrevious = 0
@@ -354,61 +354,61 @@ class MT3D {
         {
           for(let i = 0; i <= 2*Math.PI; i+=Math.PI/n)
           {
-            let xPreviousMeridian = r*Math.cos(iPrevious)*Math.sin(thetaPrevious),
-                yPreviousMeridian = r*Math.sin(iPrevious)*Math.sin(thetaPrevious),
-                zPreviousMeridian = r*Math.cos(thetaPrevious)
+            let x1 = r*Math.cos(iPrevious)*Math.sin(thetaPrevious),
+                y1 = r*Math.sin(iPrevious)*Math.sin(thetaPrevious),
+                z1 = r*Math.cos(thetaPrevious)
 
-            let xPrevious2 = r*Math.cos(iPrevious)*Math.sin(theta),
-                yPrevious2 = r*Math.sin(iPrevious)*Math.sin(theta),
-                zPrevious2 = r*Math.cos(theta)
+            let x2 = r*Math.cos(iPrevious)*Math.sin(theta),
+                y2 = r*Math.sin(iPrevious)*Math.sin(theta),
+                z2 = r*Math.cos(theta)
 
             // Current Meridian Previous Parallel
-            let xCurrentMeridianPreviousParallel = r*Math.cos(i)*Math.sin(thetaPrevious),
-                yCurrentMeridianPreviousParallel = r*Math.sin(i)*Math.sin(thetaPrevious),
-                zCurrentMeridianPreviousParallel = r*Math.cos(thetaPrevious)
+            let x3 = r*Math.cos(i)*Math.sin(thetaPrevious),
+                y3 = r*Math.sin(i)*Math.sin(thetaPrevious),
+                z3 = r*Math.cos(thetaPrevious)
 
-            let x = r*Math.cos(i)*Math.sin(theta),
-                y = r*Math.sin(i)*Math.sin(theta),
-                z = r*Math.cos(theta)
+            let x4 = r*Math.cos(i)*Math.sin(theta),
+                y4 = r*Math.sin(i)*Math.sin(theta),
+                z4 = r*Math.cos(theta)
             
             let c = Math.cos(theta);
             let s = Math.sin(theta);
             let w = 0;
 
             let vektor1 = [
-              xPrevious2 - xPreviousMeridian, 
-              yPrevious2 - yPreviousMeridian, 
-              zPrevious2 - zPreviousMeridian
+              x2 - x1, 
+              y2 - y1, 
+              z2 - z1
             ]
 
             let vektor2 = [
-              xPrevious2 - x, 
-              yPrevious2 - y, 
-              zPrevious2 - z
+              x2 - x4, 
+              y2 - y4, 
+              z2 - z4
             ]
 
             let vektor3 = [
-              x - xCurrentMeridianPreviousParallel, 
-              y - yCurrentMeridianPreviousParallel, 
-              z - zCurrentMeridianPreviousParallel
+              x4 - x3, 
+              y4 - y3, 
+              z4 - z3
             ]
 
             let vektor4 = [
-              xPreviousMeridian - xCurrentMeridianPreviousParallel, 
-              yPreviousMeridian - yCurrentMeridianPreviousParallel, 
-              zPreviousMeridian - zCurrentMeridianPreviousParallel
+              x1 - x3, 
+              y1 - y3, 
+              z1 - z3
             ]
 
             let normala = this.calculateNormal(vektor1,vektor2)
             let normala2 = this.calculateNormal(vektor3,vektor4)
 
-            vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala].flat())
-            vrhovi.push([xPrevious2,yPrevious2,zPrevious2, normala].flat())
-            vrhovi.push([x,y,z, normala].flat())
+            vrhovi.push([x1, y1, z1,  boja, normala].flat())
+            vrhovi.push([x2,y2,z2,    boja, normala].flat())
+            vrhovi.push([x4,y4,z4,    boja, normala].flat())
 
-            vrhovi.push([x,y,z, normala2].flat())
-            vrhovi.push([xCurrentMeridianPreviousParallel,yCurrentMeridianPreviousParallel,zCurrentMeridianPreviousParallel, normala2].flat())
-            vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala2].flat())
+            vrhovi.push([x4,y4,z4,    boja, normala2].flat())
+            vrhovi.push([x3,y3,z3,    boja, normala2].flat())
+            vrhovi.push([x1, y1, z1,  boja, normala2].flat())
             iPrevious = i;
           }
           thetaPrevious = theta;
@@ -418,8 +418,7 @@ class MT3D {
         return vrhovi;
     } // valjak
     
-    polukugla(r, m, n) {
-        
+    polukugla(r, m, n, boja=[0,0,0]) {
         var vrhovi = []; 
 
         let thetaPrevious = 0
@@ -428,57 +427,66 @@ class MT3D {
         {
           for(let i = 0; i <= 2*Math.PI; i+=Math.PI/n)
           {
-            let xPreviousMeridian = r*Math.cos(iPrevious)*Math.sin(thetaPrevious)
-            let yPreviousMeridian = r*Math.sin(iPrevious)*Math.sin(thetaPrevious)
-            let zPreviousMeridian = r*Math.cos(thetaPrevious)
 
-            let xPrevious2 = r*Math.cos(iPrevious)*Math.sin(theta)
-            let yPrevious2 = r*Math.sin(iPrevious)*Math.sin(theta)
-            let zPrevious2 = r*Math.cos(theta)
+
+            /**
+             *      x2 ________ x3
+             *       |          |  
+             *       |          |
+             *      x1 ________ x4 
+             * 
+             */
+            let x1 = r*Math.cos(iPrevious)*Math.sin(thetaPrevious),
+                y1 = r*Math.sin(iPrevious)*Math.sin(thetaPrevious),
+                z1 = r*Math.cos(thetaPrevious)
+
+            let x2 = r*Math.cos(iPrevious)*Math.sin(theta),
+                y2 = r*Math.sin(iPrevious)*Math.sin(theta),
+                z2 = r*Math.cos(theta)
 
             // Current Meridian Previous Parallel
-            let xCurrentMeridianPreviousParallel = r*Math.cos(i)*Math.sin(thetaPrevious)
-            let yCurrentMeridianPreviousParallel = r*Math.sin(i)*Math.sin(thetaPrevious)
-            let zCurrentMeridianPreviousParallel = r*Math.cos(thetaPrevious)
+            let x3 = r*Math.cos(i)*Math.sin(thetaPrevious),
+                y3 = r*Math.sin(i)*Math.sin(thetaPrevious),
+                z3 = r*Math.cos(thetaPrevious)
 
-            let x = r*Math.cos(i)*Math.sin(theta),
-                y = r*Math.sin(i)*Math.sin(theta),
-                z = r*Math.cos(theta)
+            let x4 = r*Math.cos(i)*Math.sin(theta),
+                y4 = r*Math.sin(i)*Math.sin(theta),
+                z4 = r*Math.cos(theta)
 
             let vektor1 = [
-              xPrevious2 - xPreviousMeridian, 
-              yPrevious2 - yPreviousMeridian, 
-              zPrevious2 - zPreviousMeridian
+              x2 - x1, 
+              y2 - y1, 
+              z2 - z1
             ]
 
             let vektor2 = [
-              xPrevious2 - x, 
-              yPrevious2 - y, 
-              zPrevious2 - z
+              x2 - x4, 
+              y2 - y4, 
+              z2 - z4
             ]
 
             let vektor2Invers = [
-              x - xPrevious2, 
-              y - yPrevious2, 
-              z - zPrevious2
+              x4 - x2, 
+              y4 - y2, 
+              z4 - z2
             ]
 
             let vektor3 = [
-              x - xCurrentMeridianPreviousParallel, 
-              y - yCurrentMeridianPreviousParallel, 
-              z - zCurrentMeridianPreviousParallel
+              x4 - x3, 
+              y4 - y3, 
+              z4 - z3
             ]
 
             let vektor4 = [
-              xPreviousMeridian - xCurrentMeridianPreviousParallel, 
-              yPreviousMeridian - yCurrentMeridianPreviousParallel, 
-              zPreviousMeridian - zCurrentMeridianPreviousParallel
+              x1 - x3, 
+              y1 - y3, 
+              z1 - z3
             ]
 
             let vektor4Invers = [
-              xCurrentMeridianPreviousParallel - xPreviousMeridian, 
-              yCurrentMeridianPreviousParallel - yPreviousMeridian, 
-              zCurrentMeridianPreviousParallel - zPreviousMeridian
+              x3 - x1, 
+              y3 - y1, 
+              z3 - z1
             ]
 
             let normala = this.calculateNormal(vektor1,vektor2)
@@ -488,22 +496,22 @@ class MT3D {
             let normala2Invers = this.calculateNormal(vektor3,vektor4Invers)
 
             // vanjstina
-            vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala].flat())
-            vrhovi.push([xPrevious2,yPrevious2,zPrevious2, normala].flat())
-            vrhovi.push([x,y,z, normala].flat())
+            vrhovi.push([x1, y1, z1,  boja, normala].flat())
+            vrhovi.push([x2,y2,z2,    boja, normala].flat())
+            vrhovi.push([x4,y4,z4,    boja, normala].flat())
 
-            vrhovi.push([x,y,z, normala2].flat())
-            vrhovi.push([xCurrentMeridianPreviousParallel,yCurrentMeridianPreviousParallel,zCurrentMeridianPreviousParallel, normala2].flat())
-            vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala2].flat())
+            vrhovi.push([x4,y4,z4,    boja, normala2].flat())
+            vrhovi.push([x3,y3,z3,    boja, normala2].flat())
+            vrhovi.push([x1, y1, z1,  boja, normala2].flat())
 
             // unutrasnjost
-            vrhovi.push([x,y,z, normalaInvers].flat())
-            vrhovi.push([xPrevious2, yPrevious2, zPrevious2, normalaInvers].flat())
-            vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normalaInvers].flat())
+            vrhovi.push([x4,y4,z4,    boja, normalaInvers].flat())
+            vrhovi.push([x2, y2, z2,  boja, normalaInvers].flat())
+            vrhovi.push([x1, y1, z1,  boja, normalaInvers].flat())
 
-            vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala2Invers].flat())
-            vrhovi.push([xCurrentMeridianPreviousParallel,yCurrentMeridianPreviousParallel,zCurrentMeridianPreviousParallel, normala2Invers].flat())
-            vrhovi.push([x,y,z, normala2Invers].flat())
+            vrhovi.push([x1, y1, z1,  boja, normala2Invers].flat())
+            vrhovi.push([x3,y3,z3,    boja, normala2Invers].flat())
+            vrhovi.push([x4,y4,z4,    boja, normala2Invers].flat())
 
             iPrevious = i;
           }
@@ -514,7 +522,7 @@ class MT3D {
         return vrhovi;
     }
 
-    stozac(r, h, n) {
+    stozac(r, h, n, boja=[0,0,0]) {
         var vrhovi = []; 
 
         for(let i = - 2*Math.PI/n; i <= 2*Math.PI; i+=(2*Math.PI)/n) {
@@ -543,22 +551,22 @@ class MT3D {
             z1 - z2
           ]
 
-          let normala = this.calculateNormal(vektor1,vektor2)
+          let normala = this.calculateNormal(vektor2,vektor1)
           
-          vrhovi.push([0, 0, -h / 2, 0, 0, -1]);
-          vrhovi.push([x1, y1, z1, 0, 0, -1]);
-          vrhovi.push([x2, y2, z2, 0, 0, -1]);
+          vrhovi.push([x1, y1, z1, boja,  0, 0, -1].flat());
+          vrhovi.push([0, 0, -h/2, boja,  0, 0, -1].flat());
+          vrhovi.push([x2, y2, z2, boja,  0, 0, -1].flat());
 
-          vrhovi.push([x1, y1, z1, normala].flat());
-          vrhovi.push([0, 0, h / 2, normala].flat()); // središte za TRIANGLE_FAN
-          vrhovi.push([x2, y2, z2, normala].flat());
+          vrhovi.push([0, 0, h/2,  boja, normala].flat());
+          vrhovi.push([x1, y1, z1, boja, normala].flat());
+          vrhovi.push([x2, y2, z2, boja, normala].flat());
         } // for
 
         console.log("vrhovi.length: ", vrhovi.length);
         return vrhovi;
     } // valjak
 
-    valjak(r, h, n) {
+    valjak(r, h, n, boja=[0,0,0]) {
         var vrhovi = []; 
 
         for(let i = - 2*Math.PI/n; i <= 2*Math.PI; i+=(2*Math.PI)/n) {
@@ -603,28 +611,28 @@ class MT3D {
               z12 - z22
           ]
 
-          let normala = this.calculateNormal(vektor1,vektor2)
-          let normala2 = this.calculateNormal(vektor3,vektor4)
+          let normala = this.calculateNormal(vektor2,vektor1)
+          let normala2 = this.calculateNormal(vektor4,vektor3)
           let normala3 = [-normala2[0], -normala2[1], -normala2[2]]
 
           // top
-          vrhovi.push([x12, y12, z12, normala2].flat());
-          vrhovi.push([0, 0, h / 2, normala2].flat());
-          vrhovi.push([x22, y22, z22, normala2].flat());
+          vrhovi.push([0, 0, h/2,     boja, normala2].flat());
+          vrhovi.push([x12, y12, z12, boja, normala2].flat());
+          vrhovi.push([x22, y22, z22, boja, normala2].flat());
 
           // bot
-          vrhovi.push([x2, y2, z2, normala3].flat());
-          vrhovi.push([0, 0, -h / 2, normala3].flat());
-          vrhovi.push([x1, y1, z1, normala3].flat());
+          vrhovi.push([0, 0, -h/2, boja, normala3].flat());
+          vrhovi.push([x2, y2, z2, boja, normala3].flat());
+          vrhovi.push([x1, y1, z1, boja, normala3].flat());
 
           // sides
-          vrhovi.push([x1, y1, z1, normala].flat());
-          vrhovi.push([x12, y12, z12, normala].flat());
-          vrhovi.push([x22, y22, z22, normala].flat());
+          vrhovi.push([x12, y12, z12, boja, normala].flat());
+          vrhovi.push([x1, y1, z1,    boja, normala].flat());
+          vrhovi.push([x22, y22, z22, boja, normala].flat());
 
-          vrhovi.push([x22, y22, z22, normala].flat());
-          vrhovi.push([x2, y2, z2, normala].flat());
-          vrhovi.push([x1, y1, z1, normala].flat());
+          vrhovi.push([x2, y2, z2,    boja, normala].flat());
+          vrhovi.push([x22, y22, z22, boja, normala].flat());
+          vrhovi.push([x1, y1, z1,    boja, normala].flat());
 
         } // for
 

@@ -68,8 +68,12 @@
     let visina = 0;
     let a = 1;
 
-    let xMax = yMax = 5, zMax = 20;
-    let xMin = yMin = -5, zMin = 2;
+    let xMax = yMax = 5, zMax = 25;
+    let xMin = yMin = -5, zMin = 3;
+
+    let kameraX = 5,
+        kameraY = 1,
+        kameraZ = 5
 
     window.addEventListener('load', (event) => {
       platno1 = document.getElementById("slika1");
@@ -87,17 +91,17 @@
 
       // vrhovi za objekte
       GPUprogram1.floorVrhovi = mt3d.floorY(xMin, xMax, yMin, yMax, zMin, zMax, a/2),
-      GPUprogram1.polukuglaVrhovi = mt3d.polukugla(),
-      GPUprogram1.stozacVrhovi = mt3d.stozac(0.5,2,34),
-      GPUprogram1.valjakVrhovi1 = mt3d.valjak(),
-      GPUprogram1.valjakVrhovi2 = mt3d.valjak();
+      GPUprogram1.stozacVrhovi = mt3d.stozac(2*a,4*a,10, [1,0,1]),
+      GPUprogram1.valjakVrhovi1 = mt3d.valjak(0.7*a,0.6*a,10, [1,0,0]),
+      GPUprogram1.valjakVrhovi2 = mt3d.valjak(0.1*a,2*a,10, [0.5,0,0.7]);
+      GPUprogram1.polukuglaVrhovi = mt3d.polukugla(0.5*a,10,10, [0.6,0,0.5]),
       
       // VAO za objekte
       GPUprogram1.floorVAO = napuniSpremnike(GPUprogram1.floorVrhovi);
-      GPUprogram1.polukuglaVAO = napuniSpremnike(GPUprogram1.polukuglaVrhovi);
       GPUprogram1.stozacVAO = napuniSpremnike(GPUprogram1.stozacVrhovi);
       GPUprogram1.valjakVAO1 = napuniSpremnike(GPUprogram1.valjakVrhovi1);
       GPUprogram1.valjakVAO2 = napuniSpremnike(GPUprogram1.valjakVrhovi2);
+      GPUprogram1.polukuglaVAO = napuniSpremnike(GPUprogram1.polukuglaVrhovi);
 
       postaviSvjetlo()
 
@@ -110,9 +114,9 @@
       GPUprogram1.u_bojaIzvora = gl.getUniformLocation(GPUprogram1, "u_bojaIzvora");
       GPUprogram1.u_kameraXYZ = gl.getUniformLocation(GPUprogram1, "u_kameraXYZ");
 
-      let x = 0,
-          y = 0,
-          z = 0;
+      let x = 10,
+          y = 10,
+          z = 10;
 
       // vektori položaja izvora svjetlosti i kamere
       gl.uniform3fv(GPUprogram1.u_izvorSvjetla, [x,y,z]);
@@ -157,35 +161,69 @@
 
       mt3d.identitet()
 
-      korak = (korak + 0.01)%(2*Math.PI)
 
       // let kameraX = Math.cos(korak)*6,
       //     kameraY = Math.sin(korak)*6,
       //     kameraZ = 1
-      let kameraX = 4,
-          kameraY = 3,
-          kameraZ = 3
+      
       
 
       mt3d.persp(xMin, xMax, yMin, yMax, zMin, zMax)
-
       mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
       mt3d.transKamera();
 
       iscrtaj(GPUprogram1.floorVrhovi, gl.LINE_STRIP, GPUprogram1.floorVAO)
-      f()
+      vjetromjer()
       requestAnimationFrame(crtajSliku)
     }
     
     // funkcija za crtanje vjetromjera
     function vjetromjer()
     {
+      korak = (korak + 0.4)%(360)
 
+      mt3d.pomakni(0,0,2*a)
+      iscrtaj(GPUprogram1.stozacVrhovi, gl.TRIANGLES, GPUprogram1.stozacVAO)
+
+      mt3d.pomakni(0,0,1.4*a)
+      mt3d.rotirajZ(korak)
+      iscrtaj(GPUprogram1.valjakVrhovi1, gl.TRIANGLES, GPUprogram1.valjakVAO1)
+
+      krakSPoluKuglom(korak)
+      krakSPoluKuglom(korak+120)
+      krakSPoluKuglom(korak+240)
+
+      
     }
-    function f()
-    {
-      iscrtaj(GPUprogram1.stozacVrhovi, gl.TRIANGLES, GPUprogram1.kockaVAO)
 
+    function krakSPoluKuglom(kut=0)
+    {
+      
+      let radijani = kut * Math.PI / 180;
+      let x = -2.47*Math.cos(radijani)
+      let y = -2.47*Math.sin(radijani)
+
+      mt3d.identitet()
+      mt3d.persp(xMin, xMax, yMin, yMax, zMin, zMax)
+      mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
+      mt3d.transKamera();
+
+      mt3d.pomakni(0,0,3.5*a)
+      mt3d.rotirajY(90)
+      mt3d.rotirajX(-kut)
+      mt3d.pomakni(0,0,-1*a)
+      iscrtaj(GPUprogram1.valjakVrhovi2, gl.TRIANGLES, GPUprogram1.valjakVAO2)
+
+
+      mt3d.identitet()
+      mt3d.persp(xMin, xMax, yMin, yMax, zMin, zMax)
+      mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
+      mt3d.transKamera();
+
+      mt3d.pomakni(x,y,3.4*a)
+      mt3d.rotirajX(90)
+      mt3d.rotirajY(kut)
+      iscrtaj(GPUprogram1.polukuglaVrhovi, gl.TRIANGLES, GPUprogram1.polukuglaVAO)
     }
 	</script>
 	</head>
