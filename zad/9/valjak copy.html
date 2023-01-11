@@ -94,21 +94,9 @@
                 z12 - z22
             ]
 
-            let vektor6 = [
-                0 - x1, 
-                0 - y1, 
-                -h/2 - z1
-            ]
-
-            let vektor5 = [
-                x2 - x1, 
-                y2 - x1, 
-                z2 - x1
-            ]
-
-            let normala = calculateNormal(vektor2,vektor1)
+            let normala = calculateNormal(vektor1,vektor2)
             let normala2 = calculateNormal(vektor3,vektor4)
-            let normala3 = calculateNormal(vektor5,vektor6)
+            let normala3 = [-normala2[0], -normala2[1], -normala2[2]]
 
             // top
             vrhovi.push([x12, y12, z12, normala2].flat());

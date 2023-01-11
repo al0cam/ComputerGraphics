@@ -368,9 +368,9 @@ class MT3D {
                 yCurrentMeridianPreviousParallel = r*Math.sin(i)*Math.sin(thetaPrevious),
                 zCurrentMeridianPreviousParallel = r*Math.cos(thetaPrevious)
 
-            x = r*Math.cos(i)*Math.sin(theta)
-            y = r*Math.sin(i)*Math.sin(theta)
-            z = r*Math.cos(theta)
+            let x = r*Math.cos(i)*Math.sin(theta),
+                y = r*Math.sin(i)*Math.sin(theta),
+                z = r*Math.cos(theta)
             
             let c = Math.cos(theta);
             let s = Math.sin(theta);
@@ -400,8 +400,8 @@ class MT3D {
               zPreviousMeridian - zCurrentMeridianPreviousParallel
             ]
 
-            let normala = calculateNormal(vektor1,vektor2)
-            let normala2 = calculateNormal(vektor3,vektor4)
+            let normala = this.calculateNormal(vektor1,vektor2)
+            let normala2 = this.calculateNormal(vektor3,vektor4)
 
             vrhovi.push([xPreviousMeridian, yPreviousMeridian, zPreviousMeridian, normala].flat())
             vrhovi.push([xPrevious2,yPrevious2,zPrevious2, normala].flat())
@@ -449,7 +449,7 @@ class MT3D {
             z1 - z2
           ]
 
-          let normala = calculateNormal(vektor1,vektor2)
+          let normala = this.calculateNormal(vektor1,vektor2)
           
           vrhovi.push([0, 0, -h / 2, 0, 0, -1]);
           vrhovi.push([x1, y1, z1, 0, 0, -1]);
@@ -497,17 +497,31 @@ class MT3D {
               z1 - z2
           ]
 
-          let normala = vektorskiProdukt(vektor2,vektor1)
+          let vektor3 = [
+              0 - x22, 
+              0 - y22, 
+              h/2 - z22
+          ]
 
-          // top but light is bot
-          vrhovi.push([x12, y12, z12, 0, 0, -1]);
-          vrhovi.push([0, 0, h / 2, 0, 0, -1]);
-          vrhovi.push([x22, y22, z22, 0, 0, -1]);
+          let vektor4 = [
+              x12 - x22, 
+              y12 - y22, 
+              z12 - z22
+          ]
 
-          // bot but light is top
-          vrhovi.push([x2, y2, z2, 0, 0, 1]);
-          vrhovi.push([0, 0, -h / 2, 0, 0, 1]);
-          vrhovi.push([x1, y1, z1, 0, 0, 1]);
+          let normala = this.calculateNormal(vektor1,vektor2)
+          let normala2 = this.calculateNormal(vektor3,vektor4)
+          let normala3 = [-normala2[0], -normala2[1], -normala2[2]]
+
+          // top
+          vrhovi.push([x12, y12, z12, normala2].flat());
+          vrhovi.push([0, 0, h / 2, normala2].flat());
+          vrhovi.push([x22, y22, z22, normala2].flat());
+
+          // bot
+          vrhovi.push([x2, y2, z2, normala3].flat());
+          vrhovi.push([0, 0, -h / 2, normala3].flat());
+          vrhovi.push([x1, y1, z1, normala3].flat());
 
           // sides
           vrhovi.push([x1, y1, z1, normala].flat());
@@ -525,5 +539,56 @@ class MT3D {
     } // valjak
     
 
-
+    kocka()
+    {
+      return [
+        // front but in persp bot  
+        [-brid, brid, -brid,   0, 1, 0,   0, -1, 0],
+        [brid, -brid, -brid,   0, 1, 0,   0, -1, 0],
+        [-brid, -brid, -brid,  0, 1, 0,   0, -1, 0],
+        [brid, -brid, -brid,   0, 1, 0,   0, -1, 0],
+        [-brid, brid, -brid,   0, 1, 0,   0, -1, 0],
+        [brid, brid, -brid,    0, 1, 0,   0, -1, 0],
+        
+        // left  but in persp back
+        [-brid, brid, -brid,   1, 0, 0,   0, 0, 0],
+        [-brid, -brid, brid,   1, 0, 0,   0, 0, 0],
+        [-brid, brid, brid,    1, 0, 0,   0, 0, 0],
+        [-brid, -brid, brid,   1, 0, 0,   0, 0, 0],
+        [-brid, brid, -brid,   1, 0, 0,   0, 0, 0],
+        [-brid, -brid, -brid,  1, 0, 0,   0, 0, 0],
+  
+        // bot  but in persp left
+        [-brid, -brid, -brid,  0, 0, 0,   1, 1, 1],
+        [brid, -brid, brid,    0, 0, 0,   1, 1, 1],
+        [-brid, -brid, brid,   0, 0, 0,   1, 1, 1],
+        [brid, -brid, brid,    0, 0, 0,   1, 1, 1],
+        [-brid, -brid, -brid,  0, 0, 0,   1, 1, 1],
+        [brid, -brid, -brid,   0, 0, 0,   1, 1, 1],
+  
+        // right  but in persp front
+        [brid, -brid, -brid,   0, 0, 1,   0, 0, 0],
+        [brid, brid, brid,     0, 0, 1,   0, 0, 0],
+        [brid, -brid, brid,    0, 0, 1,   0, 0, 0],
+        [brid, brid, brid,     0, 0, 1,   0, 0, 0],
+        [brid, -brid, -brid,   0, 0, 1,   0, 0, 0],
+        [brid, brid, -brid,    0, 0, 1,   0, 0, 0],
+  
+        // back  but in persp top
+        [brid, -brid, brid,    1, 1, 1,   0, 1, 1],
+        [-brid, brid, brid,    1, 1, 1,   0, 1, 1],
+        [-brid, -brid, brid,   1, 1, 1,   0, 1, 1],
+        [-brid, brid, brid,    1, 1, 1,   0, 1, 1],
+        [brid, -brid, brid,    1, 1, 1,   0, 1, 1],
+        [brid, brid, brid,     1, 1, 1,   0, 1, 1],
+  
+        // top  but in persp right
+        [brid, brid, brid,     1, 0, 1,   1, 1, 1],
+        [-brid, brid, -brid,   1, 0, 1,   1, 1, 1],
+        [-brid, brid, brid,    1, 0, 1,   1, 1, 1],
+        [-brid, brid, -brid,   1, 0, 1,   1, 1, 1],
+        [brid, brid, brid,     1, 0, 1,   1, 1, 1],
+        [brid, brid, -brid,    1, 0, 1,   1, 1, 1],
+      ];
+    }
 }
