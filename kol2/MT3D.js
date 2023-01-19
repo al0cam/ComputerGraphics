@@ -641,6 +641,189 @@ class MT3D {
         return vrhovi;
     } // valjak
 
+
+    propeler(r, h, n, boja=[0,0,0]) {
+        var vrhovi = []; 
+
+        for(let i = - 2*Math.PI/n; i <= 2*Math.PI; i+=(2*Math.PI)/n) {
+
+          let x1 = r * Math.cos(i),
+              y1 = r * Math.sin(i),
+              z1 = -h/2;
+
+          let x12 = r * Math.cos(i),
+              y12 = r * Math.sin(i),
+              z12 = h/2;
+
+          let x2 = r * Math.cos(i+2*Math.PI/n),
+              y2 = r * Math.sin(i+2*Math.PI/n),
+              z2 = -h/2;
+
+          let x22 = r * Math.cos(i+2*Math.PI/n),
+              y22 = r * Math.sin(i+2*Math.PI/n),
+              z22 = h/2;
+
+          let vektor1 = [
+              x12 - x1, 
+              y12 - y1, 
+              z12 - z1
+          ]
+
+          let vektor2 = [
+              x1 - x2, 
+              y1 - y2, 
+              z1 - z2
+          ]
+
+          let vektor1Invers = [
+            x1 - x12, 
+            y1 - y12, 
+            z1 - z12
+        ]
+
+          let normala = this.calculateNormal(vektor2,vektor1)
+          let normalaInvers = this.calculateNormal(vektor2,vektor1Invers)
+         
+
+          // sides izvana
+          vrhovi.push([x12, y12, z12, boja, normala].flat());
+          vrhovi.push([x1, y1, z1,    boja, normala].flat());
+          vrhovi.push([x22, y22, z22, boja, normala].flat());
+
+          vrhovi.push([x2, y2, z2,    boja, normala].flat());
+          vrhovi.push([x22, y22, z22, boja, normala].flat());
+          vrhovi.push([x1, y1, z1,    boja, normala].flat());
+
+          // sides unutra
+          vrhovi.push([x1, y1, z1,    boja, normalaInvers].flat());
+          vrhovi.push([x12, y12, z12, boja, normalaInvers].flat());
+          vrhovi.push([x22, y22, z22, boja, normalaInvers].flat());
+
+          vrhovi.push([x22, y22, z22, boja, normalaInvers].flat());
+          vrhovi.push([x2, y2, z2,    boja, normalaInvers].flat());
+          vrhovi.push([x1, y1, z1,    boja, normalaInvers].flat());
+
+        } // for
+
+        for(let i = 0; i < 3; i++)
+        {
+            let trokut = i*2*Math.PI/3;
+
+            let x1 = r * Math.cos(trokut),
+                y1 = r * Math.sin(trokut),
+                z1 = -h/2;
+
+            let x2 = r * Math.cos(trokut+Math.PI/6),
+                y2 = r * Math.sin(trokut+Math.PI/6);
+
+
+            let vektor1 = [
+                x2 - x1,
+                y2 - y1,
+                z1
+            ];
+
+            let vektor2 = [
+                x1,
+                y1,
+                z1
+            ]
+            let vektor1Invers = [
+                x1 - x2,
+                x1 - y2,
+                z1
+            ];
+
+            let normala = this.calculateNormal(vektor1,vektor2)
+            let normalaInvers = this.calculateNormal(vektor1Invers,vektor2)
+
+            vrhovi.push([0,0,0,         boja, normala].flat());
+            vrhovi.push([x1, y1, z1,    boja, normala].flat());
+            vrhovi.push([x2, y2, -z1,   boja, normala].flat());
+
+            vrhovi.push([x1, y1, z1,    boja, normalaInvers].flat());
+            vrhovi.push([0,0,0,         boja, normalaInvers].flat());
+            vrhovi.push([x2, y2, -z1,   boja, normalaInvers].flat());
+        }
+
+        console.log("vrhovi.length: ", vrhovi.length);
+        return vrhovi;
+    } // valjak
+
+    elipsastiValjak(x,y, h, n, boja=[0,0,0]) {
+        var vrhovi = []; 
+
+        for(let i = - 2*Math.PI/n; i <= 2*Math.PI; i+=(2*Math.PI)/n) {
+
+          let x1 = x*Math.cos(i),
+              y1 = y*Math.sin(i),
+              z1 = -h/2;
+
+          let x12 = x*Math.cos(i),
+              y12 = y*Math.sin(i),
+              z12 = h/2;
+
+          let x2 = x*Math.cos(i+2*Math.PI/n),
+              y2 = y*Math.sin(i+2*Math.PI/n),
+              z2 = -h/2;
+
+          let x22 = x*Math.cos(i+2*Math.PI/n),
+              y22 = y*Math.sin(i+2*Math.PI/n),
+              z22 = h/2;
+
+          let vektor1 = [
+              x12 - x1, 
+              y12 - y1, 
+              z12 - z1
+          ]
+
+          let vektor2 = [
+              x1 - x2, 
+              y1 - y2, 
+              z1 - z2
+          ]
+
+          let vektor3 = [
+              0 - x22, 
+              0 - y22, 
+              h/2 - z22
+          ]
+
+          let vektor4 = [
+              x12 - x22, 
+              y12 - y22, 
+              z12 - z22
+          ]
+
+          let normala = this.calculateNormal(vektor2,vektor1)
+          let normala2 = this.calculateNormal(vektor4,vektor3)
+          let normala3 = [-normala2[0], -normala2[1], -normala2[2]]
+
+          // top
+          vrhovi.push([0, 0, h/2,     boja, normala2].flat());
+          vrhovi.push([x12, y12, z12, boja, normala2].flat());
+          vrhovi.push([x22, y22, z22, boja, normala2].flat());
+
+          // bot
+          vrhovi.push([0, 0, -h/2, boja, normala3].flat());
+          vrhovi.push([x2, y2, z2, boja, normala3].flat());
+          vrhovi.push([x1, y1, z1, boja, normala3].flat());
+
+          // sides
+          vrhovi.push([x12, y12, z12, boja, normala].flat());
+          vrhovi.push([x1, y1, z1,    boja, normala].flat());
+          vrhovi.push([x22, y22, z22, boja, normala].flat());
+
+          vrhovi.push([x2, y2, z2,    boja, normala].flat());
+          vrhovi.push([x22, y22, z22, boja, normala].flat());
+          vrhovi.push([x1, y1, z1,    boja, normala].flat());
+
+        } // for
+
+        console.log("vrhovi.length: ", vrhovi.length);
+        return vrhovi;
+    } // valjak
+
     kocka(brid)
     {
       return [

@@ -92,17 +92,21 @@
       // vrhovi za objekte
       // GPUprogram1.floorVrhovi = mt3d.floorY(xMin, xMax, yMin, yMax, zMin, zMax, a/2),
       // GPUprogram1.stozacVrhovi = mt3d.stozac(2*a,4*a,30, [1,1,1]),
-      GPUprogram1.valjakVrhovi1 = mt3d.valjak(0.3*a,1.5*a,30, [0.7,0.7,0]),
       GPUprogram1.valjakVrhovi2 = mt3d.valjak(1*a,2*a,30, [0.7,0.7,0]);
       GPUprogram1.polukuglaVrhovi = mt3d.polukugla(1*a,30,30, [0.7,0.7,0]),
+      GPUprogram1.elipsastiValjak = mt3d.elipsastiValjak(0.3*a,0.2*a,1.5*a,30, [0.7,0.7,0]),
+      GPUprogram1.propeler = mt3d.propeler(1*a,0.5*a,30, [0.7,0.7,0]),
+      GPUprogram1.valjakVrhoviPropeler = mt3d.valjak(0.15*a,0.7*a,30, [0.7,0.7,0]);
       
       
       // VAO za objekte
       // GPUprogram1.floorVAO = napuniSpremnike(GPUprogram1.floorVrhovi);
       // GPUprogram1.stozacVAO = napuniSpremnike(GPUprogram1.stozacVrhovi);
-      GPUprogram1.valjakVAO1 = napuniSpremnike(GPUprogram1.valjakVrhovi1);
       GPUprogram1.valjakVAO2 = napuniSpremnike(GPUprogram1.valjakVrhovi2);
       GPUprogram1.polukuglaVAO = napuniSpremnike(GPUprogram1.polukuglaVrhovi);
+      GPUprogram1.elipsastiValjakVAO = napuniSpremnike(GPUprogram1.elipsastiValjak);
+      GPUprogram1.propelerVAO = napuniSpremnike(GPUprogram1.propeler);
+      GPUprogram1.valjakVAOPropeler = napuniSpremnike(GPUprogram1.valjakVrhoviPropeler);
 
       postaviSvjetlo()
 
@@ -115,15 +119,23 @@
       GPUprogram1.u_bojaIzvora = gl.getUniformLocation(GPUprogram1, "u_bojaIzvora");
       GPUprogram1.u_kameraXYZ = gl.getUniformLocation(GPUprogram1, "u_kameraXYZ");
 
-      let x = 10,
-          y = 10,
+      let x = 0,
+          y = 0,
           z = 10;
+
+      let xKamera = 30,
+          yKamera = 30,
+          zKamera = 30;
+
+
+
+
 
       // vektori položaja izvora svjetlosti i kamere
       gl.uniform3fv(GPUprogram1.u_izvorSvjetla, [x,y,z]);
-      gl.uniform3fv(GPUprogram1.u_kameraXYZ, [0, 0, 0]);
+      gl.uniform3fv(GPUprogram1.u_kameraXYZ, [xKamera, yKamera, zKamera]);
 
-      gl.uniform3fv(GPUprogram1.u_bojaIzvora, [1.0, 1.0, 1.0]);
+      gl.uniform3fv(GPUprogram1.u_bojaIzvora, [1, 1, 1]);
     }
 
     function napuniSpremnike(vrhovi) {
@@ -160,13 +172,12 @@
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       gl.viewport(0, 0, platno1.width, platno1.height);
 
-      mt3d.identitet()
-
-      mt3d.persp(xMin, xMax, yMin, yMax, zMin, zMax)
-      mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
-      mt3d.transKamera();
+     
 
       podmornica()
+
+
+      
       requestAnimationFrame(crtajSliku)
     }
 
@@ -175,6 +186,37 @@
       korak = (korak + 0.4)%(360)
 
       trup(korak)
+      propeler(korak)
+    }
+
+    function propeler(kut=0)
+    {
+      let radijani = kut * Math.PI / 180;
+      let x = -2.3*Math.cos(radijani)
+      let y = -2.3*Math.sin(radijani)
+
+      mt3d.identitet()
+      mt3d.persp(xMin, xMax, yMin, yMax, zMin, zMax)
+      mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
+      mt3d.transKamera();
+
+      mt3d.pomakni(-x,-y,1*a)
+      mt3d.rotirajX(90)
+      mt3d.rotirajY(kut+90)
+      mt3d.rotirajZ(-kut*3)
+      iscrtaj(GPUprogram1.propeler, gl.TRIANGLES, GPUprogram1.propelerVAO);
+
+      mt3d.identitet()
+      mt3d.persp(xMin, xMax, yMin, yMax, zMin, zMax)
+      mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
+      mt3d.transKamera();
+
+      mt3d.pomakni(-x,-y,1*a)
+      mt3d.rotirajX(90)
+      mt3d.rotirajY(kut+90)
+      mt3d.rotirajZ(kut*2)
+      iscrtaj(GPUprogram1.valjakVrhoviPropeler, gl.TRIANGLES, GPUprogram1.valjakVAOPropeler);
+
     }
 
     function trup(kut=0)
@@ -223,9 +265,8 @@
 
 
       mt3d.pomakni(x/2,y/2,1.5*a)
-      // mt3d.rotirajY(90)
       mt3d.rotirajZ(kut)
-      iscrtaj(GPUprogram1.valjakVrhovi1, gl.TRIANGLES, GPUprogram1.valjakVAO1)
+      iscrtaj(GPUprogram1.elipsastiValjak, gl.TRIANGLES, GPUprogram1.elipsastiValjakVAO);
 
     }
 
