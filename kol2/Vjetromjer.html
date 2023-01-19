@@ -90,15 +90,16 @@
       mt3d = new MT3D();
 
       // vrhovi za objekte
-      GPUprogram1.floorVrhovi = mt3d.floorY(xMin, xMax, yMin, yMax, zMin, zMax, a/2),
-      GPUprogram1.stozacVrhovi = mt3d.stozac(2*a,4*a,300, [1,1,1]),
-      GPUprogram1.valjakVrhovi1 = mt3d.valjak(0.7*a,0.6*a,300, [1,1,0]),
-      GPUprogram1.valjakVrhovi2 = mt3d.valjak(0.1*a,2*a,300, [1,1,0]);
-      GPUprogram1.polukuglaVrhovi = mt3d.polukugla(0.5*a,300,300, [1,0.3,0]),
+      // GPUprogram1.floorVrhovi = mt3d.floorY(xMin, xMax, yMin, yMax, zMin, zMax, a/2),
+      // GPUprogram1.stozacVrhovi = mt3d.stozac(2*a,4*a,30, [1,1,1]),
+      GPUprogram1.valjakVrhovi1 = mt3d.valjak(0.3*a,1.5*a,30, [0.7,0.7,0]),
+      GPUprogram1.valjakVrhovi2 = mt3d.valjak(1*a,2*a,30, [0.7,0.7,0]);
+      GPUprogram1.polukuglaVrhovi = mt3d.polukugla(1*a,30,30, [0.7,0.7,0]),
+      
       
       // VAO za objekte
-      GPUprogram1.floorVAO = napuniSpremnike(GPUprogram1.floorVrhovi);
-      GPUprogram1.stozacVAO = napuniSpremnike(GPUprogram1.stozacVrhovi);
+      // GPUprogram1.floorVAO = napuniSpremnike(GPUprogram1.floorVrhovi);
+      // GPUprogram1.stozacVAO = napuniSpremnike(GPUprogram1.stozacVrhovi);
       GPUprogram1.valjakVAO1 = napuniSpremnike(GPUprogram1.valjakVrhovi1);
       GPUprogram1.valjakVAO2 = napuniSpremnike(GPUprogram1.valjakVrhovi2);
       GPUprogram1.polukuglaVAO = napuniSpremnike(GPUprogram1.polukuglaVrhovi);
@@ -165,44 +166,32 @@
       mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
       mt3d.transKamera();
 
-      iscrtaj(GPUprogram1.floorVrhovi, gl.LINE_STRIP, GPUprogram1.floorVAO)
-      vjetromjer()
+      podmornica()
       requestAnimationFrame(crtajSliku)
     }
-    
-    // funkcija za crtanje vjetromjera
-    function vjetromjer()
+
+    function podmornica()
     {
       korak = (korak + 0.4)%(360)
 
-      mt3d.pomakni(0,0,2*a)
-      iscrtaj(GPUprogram1.stozacVrhovi, gl.TRIANGLES, GPUprogram1.stozacVAO)
-
-      mt3d.pomakni(0,0,1.4*a)
-      mt3d.rotirajZ(korak)
-      iscrtaj(GPUprogram1.valjakVrhovi1, gl.TRIANGLES, GPUprogram1.valjakVAO1)
-
-      krakSPoluKuglom(korak)
-      krakSPoluKuglom(korak+120)
-      krakSPoluKuglom(korak+240)
+      trup(korak)
     }
 
-    function krakSPoluKuglom(kut=0)
+    function trup(kut=0)
     {
       
       let radijani = kut * Math.PI / 180;
-      let x = -2.47*Math.cos(radijani)
-      let y = -2.47*Math.sin(radijani)
+      let x = -1*Math.cos(radijani)
+      let y = -1*Math.sin(radijani)
 
       mt3d.identitet()
       mt3d.persp(xMin, xMax, yMin, yMax, zMin, zMax)
       mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
       mt3d.transKamera();
 
-      mt3d.pomakni(0,0,3.5*a)
+      mt3d.pomakni(0,0,a)
       mt3d.rotirajY(90)
       mt3d.rotirajX(-kut)
-      mt3d.pomakni(0,0,-1*a)
       iscrtaj(GPUprogram1.valjakVrhovi2, gl.TRIANGLES, GPUprogram1.valjakVAO2)
 
 
@@ -211,17 +200,41 @@
       mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
       mt3d.transKamera();
 
-      mt3d.pomakni(x,y,3.4*a)
+      mt3d.pomakni(x,y,a)
       mt3d.rotirajX(90)
-      mt3d.rotirajY(kut)
+      mt3d.rotirajY(kut-90)
       iscrtaj(GPUprogram1.polukuglaVrhovi, gl.TRIANGLES, GPUprogram1.polukuglaVAO)
+
+      mt3d.identitet()
+      mt3d.persp(xMin, xMax, yMin, yMax, zMin, zMax)
+      mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
+      mt3d.transKamera();
+
+      mt3d.pomakni(-x,-y,a)
+      mt3d.rotirajX(90)
+      mt3d.rotirajY(kut+90)
+      iscrtaj(GPUprogram1.polukuglaVrhovi, gl.TRIANGLES, GPUprogram1.polukuglaVAO)
+
+
+      mt3d.identitet()
+      mt3d.persp(xMin, xMax, yMin, yMax, zMin, zMax)
+      mt3d.postaviKameru(kameraX,kameraY,kameraZ,0,0,0,0,0,1)
+      mt3d.transKamera();
+
+
+      mt3d.pomakni(x/2,y/2,1.5*a)
+      // mt3d.rotirajY(90)
+      mt3d.rotirajZ(kut)
+      iscrtaj(GPUprogram1.valjakVrhovi1, gl.TRIANGLES, GPUprogram1.valjakVAO1)
+
     }
+
 	</script>
 	</head>
 	<body>
 		<h1>WebGL2 - bojanje vrhova</h1>
 		<div>
-			<canvas id="slika1" style="border:5px solid black" width="1000" height="1000">
+			<canvas id="slika1" style="border:5px solid black" width="800" height="600">
 				Vaš preglednik ne podržava HTML5 canvas.
       </canvas>
 		</div>
