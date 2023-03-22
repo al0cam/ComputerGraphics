@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="hr"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="UTF-8">
+		<title>Teksture na kvadru</title>
+		<script src="RG-primjer11-4_files/RG-WebGL.js"></script>
+
+		<script>
+      window.onload = WebGLaplikacija;
+
+		  async function WebGLaplikacija() {
+
+        async function ucitajSliku(url) {
+          const slika = new Image();
+          slika.src = url;
+          try {
+            await slika.decode();
+          } catch(err) {
+            console.log('Greška: ', err);
+          }
+          return slika;
+        } // ucitajSliku
+
+        // učitavanje teksture
+        var slika = await ucitajSliku('starigrad.jpg');
+        if (!slika.width) {
+          alert('Nema teksture!');
+          return;
+        } // if
+
+        var platno1 = document.getElementById("slika1");
+        var gl = platno1.getContext("webgl2");
+        if (!gl) alert("WebGL2 nije dostupan!");
+
+        var GPUprog1 = pripremiGPUprogram(gl, "vertex-shader", "fragment-shader");
+        gl.useProgram(GPUprog1); // možemo imati više GPU programa
+
+        // povezivanje s uniform varijablama u programima za sjenčanje
+        GPUprog1.u_mTrans = gl.getUniformLocation(GPUprog1, "u_mTrans");
+        GPUprog1.u_boja = gl.getUniformLocation(GPUprog1, "u_boja");
+        GPUprog1.u_slika = gl.getUniformLocation(GPUprog1, "u_slika");
+        GPUprog1.u_mix = gl.getUniformLocation(GPUprog1, "u_mix");
+
+        // stranice kvadra
+        var ax = 0.6, ay = 0.6, az = 1.2;
+
+        // kvadar kojem su rubovi koordinatne osi,
+        // a središte je u (ax / 2, ay / 2, az / 2)
+        var kvadar = [
+           [ 0,  0,  0,    0, 0], // lijeva ploha
+           [ax,  0,  0,  0.5, 0],
+           [ax,  0, az,  0.5, 1],
+           [ 0,  0, az,    0, 1],
+
+           [ax,  0,  0,  0.5, 0], // prednja ploha
+           [ax, ay,  0,    1, 0],
+           [ax, ay, az,    1, 1],
+           [ax,  0, az,  0.5, 1],
+           
+           [ 0, ay,  0,  0.5, 0], // desna ploha
+           [ax, ay,  0,    0, 0], 
+           [ax, ay, az,    0, 1],
+           [ 0, ay, az,  0.5, 1],
+            
+           [ 0,  0,  0,    1, 0], // straznja ploha
+           [ 0, ay,  0,  0.5, 0], 
+           [ 0, ay, az,  0.5, 1], 
+           [ 0,  0, az,    1, 1],
+
+           [ 0,  0, az,    0, 0], // gornja ploha
+           [ax,  0, az,    1, 0],
+           [ax, ay, az,    1, 1],
+           [ 0, ay, az,    0, 1]
+         ];
+
+        // translacija kvadra tako da mu je središte u ishodištu
+        var vrhovi = [];
+        for(let i = 0; i < kvadar.length; i++) {
+          vrhovi.push(
+            kvadar[i][0] - ax / 2,
+            kvadar[i][1] - ay / 2,
+            kvadar[i][2] - az / 2,
+            kvadar[i][3],  // koordinate tekstura ostaju iste
+            kvadar[i][4]); // koordinate tekstura ostaju iste
+        } // for
+
+        console.log("vrhovi.length: ", vrhovi.length);
+
+        function napuniSpremnike() {
+          GPUprog1.a_vrhXYZ = gl.getAttribLocation(GPUprog1, "a_vrhXYZ");
+          GPUprog1.a_teksturaST = gl.getAttribLocation(GPUprog1, "a_teksturaST");
+
+          // kreiranje teksture
+          tekstura0 = gl.createTexture();
+          gl.bindTexture(gl.TEXTURE_2D, tekstura0);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); // mora se definirati
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); // ovo je default
+          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); // preokreće sliku tako da je donji kut (0, 0)
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, slika);
+
+          // pripremi koordinate vrhova i teksture
+          gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+          gl.enableVertexAttribArray(GPUprog1.a_vrhXYZ);
+          gl.enableVertexAttribArray(GPUprog1.a_teksturaST);
+          gl.vertexAttribPointer(GPUprog1.a_vrhXYZ, 3, gl.FLOAT, false, 20, 0);
+          gl.vertexAttribPointer(GPUprog1.a_teksturaST, 2, gl.FLOAT, false, 20, 12);
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vrhovi), gl.STATIC_DRAW);
+        } // napuniSpremnike
+
+        function iscrtaj() {
+          gl.clearColor(0, 0, 0, 1);
+          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+          gl.viewport(0, 0, platno1.width, platno1.height);
+
+          // animacija miješanja boje i teksture
+          mix += dmix; if(mix <= 0 || mix >= 1.8) dmix = -dmix;
+          gl.uniform1f(GPUprog1.u_mix, mix < 1 ? mix : 1);
+
+          // rotacija oko sve tri osi: R_z(kut) * R_y(3 * kut) * R_x(kut)
+          kut += Math.PI / 720;
+          let c = Math.cos(kut), s = Math.sin(kut);
+          let c3 = Math.cos(3 * kut), s3 = Math.sin(3 * kut);
+          gl.uniformMatrix4fv(GPUprog1.u_mTrans, false,
+            [      -c*c3,      -c3 * s,     s3, 0,
+              c*s*(s3-1), (s*s)*s3+c*c, c3 * s, 0,
+              c*c*s3+s*s,   c*s*(s3-1),   c*c3, 0,
+                       0,            0,      0, 1]);
+
+          // kad je samo jedna tekstura ovo je zapravo nepotrebno
+          gl.activeTexture(gl.TEXTURE0);
+          gl.uniform1i(GPUprog1.u_slika, 0);
+          gl.bindTexture(gl.TEXTURE_2D, tekstura0);
+
+          // crtanje stranica kvadra u različitim bojama
+          gl.uniform4fv(GPUprog1.u_boja, [1, 0, 0, 1]); // crvena
+          gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+          gl.uniform4fv(GPUprog1.u_boja, [0, 1, 0, 1]); // zelena
+          gl.drawArrays(gl.TRIANGLE_FAN, 4, 4);
+          gl.uniform4fv(GPUprog1.u_boja, [0, 0, 1, 1]); // plava
+          gl.drawArrays(gl.TRIANGLE_FAN, 8, 4);
+          gl.uniform4fv(GPUprog1.u_boja, [1, 1, 0, 1]); // zuta
+          gl.drawArrays(gl.TRIANGLE_FAN, 12, 4);
+          gl.uniform4fv(GPUprog1.u_boja, [1, 0, 1, 1]); // ljubičasta
+          gl.drawArrays(gl.TRIANGLE_FAN, 16, 4);
+
+          requestAnimationFrame(iscrtaj);
+        } // iscrtaj
+
+        // mijenja se kod animacije
+        var kut = Math.PI / 36, dmix = 0.003, mix = dmix;
+        
+        napuniSpremnike();
+        gl.enable(gl.DEPTH_TEST);
+        iscrtaj();
+      } // WebGLaplikacija
+		</script>
+
+		<script id="vertex-shader" type="x-shader/x-vertex">
+      #version 300 es
+      in vec4 a_vrhXYZ;
+      in vec2 a_teksturaST;
+      uniform mat4 u_mTrans;
+      out vec2 v_teksturaST;
+
+      void main() {
+        v_teksturaST = a_teksturaST;
+        gl_Position = u_mTrans * a_vrhXYZ; // primijeni matrice transformacije
+      }
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+      #version 300 es
+      precision highp float;
+      uniform vec4 u_boja;
+      uniform sampler2D u_slika;
+      uniform float u_mix;
+      in vec2 v_teksturaST;
+      out vec4 bojaPiksela;
+
+      void main() {
+        bojaPiksela = vec4((1.0 - u_mix) * u_boja.rgb +
+          u_mix * texture(u_slika, v_teksturaST).rgb, 1);
+      }
+    </script>
+	</head>
+
+	<body>
+		<h1>Teksture na kvadru</h1>
+		<div>
+			<canvas id="slika1" style="border:5px solid black" width="500" height="500">
+				Vaš preglednik ne podržava HTML5 canvas.
+      </canvas>
+		</div>
+	
+</body></html>

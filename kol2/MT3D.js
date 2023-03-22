@@ -737,9 +737,9 @@ class MT3D {
             let normala = this.calculateNormal(vektor1,vektor2)
             let normalaInvers = this.calculateNormal(vektor1Invers,vektor2)
 
-            vrhovi.push([0,0,0,         boja, normala].flat());
-            vrhovi.push([x1, y1, z1,    boja, normala].flat());
-            vrhovi.push([x2, y2, -z1,   boja, normala].flat());
+            vrhovi.push([0,0,0,         [0.75,0.75,0], normala].flat());
+            vrhovi.push([x1, y1, z1,    [0.75,0.75,0], normala].flat());
+            vrhovi.push([x2, y2, -z1,   [0.75,0.75,0], normala].flat());
 
             vrhovi.push([x1, y1, z1,    boja, normalaInvers].flat());
             vrhovi.push([0,0,0,         boja, normalaInvers].flat());

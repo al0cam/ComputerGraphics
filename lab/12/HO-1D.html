@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="hr"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="UTF-8">
+		<title>Harmonijski oscilator</title>
+		<script>
+            class MT {
+                constructor(m, x0, v0) {
+					this.m = m;
+                    this.x = x0;
+                    this.v = v0;
+                } // constructor
+
+				// 2. Newtonov zakon
+                pomakni(dt, FR) {
+                    this.v += dt * FR / this.m;
+                    this.x += dt * this.v;
+                } // pomakni
+
+                // kinetička energija
+                Ek() {
+                    return 0.5 * this.m * this.v**2;
+                } // Ek
+            } // class MT
+
+			class Opruga {
+				constructor(K, xp, xn, brojprstenova) {
+					this.K = K; // koeficijent opruge
+                    this.xp = xp; // položaj početka opruge u kojem je opruga učvršćena
+                    this.xn = xn; // položaj kraja nerastegnute opruge
+                    this.brojprstenova = brojprstenova; // broj prstenova opruge
+				} // constructor
+
+				// Hookeov zakon - elastična sila
+				Fel(mt) {
+					return -this.K * (mt.x - this.xn);
+				} // Fel
+
+				// elastična potencijalna energija
+				Epel(mt) {
+					return 0.5 * this.K * (mt.x - this.xn)**2;
+				} // Epel
+
+                iscrtaj(gks, loptica) {
+                    const nsteps = 100;
+                    gks.koristiBoju("black");
+                    let xR = loptica.mt.x - this.xp > 0 ? loptica.R : -loptica.R;
+                    let xk = loptica.mt.x - xR; // kraj opruge
+                    let xstep = (xk - this.xp - xR / 2) / nsteps;
+                    let phistep = this.brojprstenova * 2 * Math.PI / nsteps;
+                    gks.postaviNa(this.xp, 0.0);
+                    gks.linijaDo(this.xp + xR / 4, 0.0);
+                    let xi = this.xp + xR / 4;
+                    let phi = 0.0;
+                    for(let i = 0; i < nsteps; i++) {
+                        xi += xstep;
+                        phi += phistep;
+                        gks.linijaDo(xi, loptica.R * Math.sin(phi));
+                    } // for
+                    gks.linijaDo(xk, 0.0);
+                    gks.povuciLiniju();
+                } // iscrtaj
+			} // class Opruga
+
+			class Loptica {
+				constructor(boja, R, m, x0, v0) {
+					this.mt = new MT(m, x0, v0);
+					this.boja = boja;
+					this.R = R;
+				} // constructor
+
+				iscrtaj(gks) {
+					gks.puniKrug(this.mt.x, 0, this.R, this.boja);
+			    } // iscrtaj
+			} // class Loptica
+			
+			function pokreni() {
+
+                class GKS {
+                    constructor(platno, xmin, xmax, ymin, ymax) {
+                        this.g = platno.getContext("2d");
+                        this.w = platno.width;
+				        this.h = platno.height;
+
+                        this.sx = this.w / (xmax - xmin);
+                        this.sy = -this.h / (ymax- ymin);
+                        this.px = -this.sx * xmin;
+                        this.py = -this.sy * ymax;
+
+                        this.xmin = xmin;
+                        this.xmax = xmax;
+                        this.ymin = ymin;
+                        this.ymax = ymax;
+                    } // constructor
+
+					ocisti() {
+						this.g.clearRect(0, 0, this.h, this.w);
+					}  // ocisti
+
+                    postaviNa(x, y) {
+                        this.g.beginPath();
+                        this.g.moveTo(this.sx * x + this.px, this.sy * y + this.py);
+                    } // postaviNa
+
+                    linijaDo(x, y) {
+                        this.g.lineTo(this.sx * x + this.px, this.sy * y + this.py);
+                    } // linijaDo
+
+                    koristiBoju(c) {
+                        this.g.strokeStyle = c;
+                    } // koristiBoju
+
+                    povuciLiniju() {
+                        this.g.stroke();
+                    } // povuciLiniju
+
+					puniKrug(x, y, R, boja) {
+				    	this.g.beginPath();
+				    	this.g.arc(this.sx * x + this.px, this.sy * y + this.py, this.sx * R, 0, 2 * Math.PI);
+                    	this.g.fillStyle = boja;
+				    	this.g.fill();
+			    	} // puniKrug
+
+					tekst(str, x, y) {
+						this.g.font = "16px Arial";
+						this.g.fillStyle = "black";
+						this.g.fillText(str, this.sx * x + this.px, this.sy * y + this.py);
+					} // tekst
+                } // class GKS
+				
+				function iscrtaj() {
+                	for(let i = 0; i < niter; i++) {
+                    	loptica1.mt.pomakni(dt,
+                            opruga1.Fel(loptica1.mt) + opruga2.Fel(loptica1.mt));
+					} // for
+
+					gks.ocisti();
+                    loptica1.iscrtaj(gks);
+                    opruga1.iscrtaj(gks, loptica1);
+                    opruga2.iscrtaj(gks, loptica1);
+
+					gks.tekst("FPS: " +
+						(iframe++ / (Date.now() / 1000 - starttime)).toFixed(6), -0.9, 0.9);
+					gks.tekst("energija: " + (loptica1.mt.Ek() +
+                        opruga1.Epel(loptica1.mt) + opruga2.Epel(loptica1.mt)), 0.0, 0.9);
+
+					requestAnimationFrame(iscrtaj);
+                } // iscrtaj
+
+				// main
+				let platno1 = document.getElementById("slika1");
+				if(!platno1) alert("Greška - nema platna!");
+
+				let gks = new GKS(platno1, -1.0, 1.0, -1.0, 1.0);
+				let opruga1 = new Opruga(10.0, -1.0, 0.0, 10);
+                let opruga2 = new Opruga(10.0, 1.0, 0.0, 10);
+				let loptica1 = new Loptica("red", 0.1, 0.5, 0.5, 0.0);
+
+				const niter = 1000;
+				const dt = 1.0 / 60.0 / niter;
+
+				let iframe = 0;
+				const starttime = Date.now() / 1000;				
+				iscrtaj();
+            } // pokreni
+
+			window.onload = pokreni;
+		</script>
+	</head>
+
+	<body>
+		<h1>Harmonijski oscilator</h1>	
+		<div>
+			<canvas id="slika1" style="border:5px solid black" width="500" height="500">
+				Vaš preglednik ne podržava HTML5 canvas.
+			</canvas>
+		</div>
+	
+</body></html>

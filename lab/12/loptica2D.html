@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="hr"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="UTF-8">
+		<title>Loptica</title>
+		<script>
+            class Vektor {
+                constructor(x, y) {
+                    this.x = x;
+                    this.y = y;
+                } // constructor
+
+                dodajCputaV(c, v) {
+                    this.x += c * v.x;
+                    this.y += c * v.y;
+                } // dodajCputaV
+            } // class Vektor
+
+            class MT {
+                constructor(m, x0, y0, vx0, vy0) {
+					this.m = m;
+                    this.r = new Vektor(x0, y0);
+                    this.v = new Vektor(vx0, vy0);
+                } // constructor
+
+				// 2. Newtonov zakon
+                pomakni(dt, FR) {
+                    this.v.dodajCputaV(dt / this.m, FR);
+                    this.r.dodajCputaV(dt, this.v);
+                } // pomakni
+            } // class MT
+
+			class Fizika {
+				constructor(g) {
+					this.g = g; // jakost polja sile teže
+				} // constructor
+
+				// kinetička energija
+				Ek(mt) {
+					return 0.5 * mt.m * (mt.v.x**2 + mt.v.y**2);
+				} // Ek
+
+				// sila teža
+				G(mt) {
+					return new Vektor(0, mt.m * (-this.g));
+				} // G 
+
+				// potencijalna energija u polju sile teže
+				EpG(mt) {
+					return mt.m * this.g * mt.r.y;
+				} // EpG
+			} // class Fizika
+
+			class Loptica {
+				constructor(boja, R, m, x0, y0, vx0, vy0) {
+					this.mt = new MT(m, x0, y0, vx0, vy0);
+					this.boja = boja;
+					this.R = R;
+				} // constructor
+
+				zarobi(gks) {
+					if((this.mt.r.x < gks.xmin + this.R) || (this.mt.r.x > gks.xmax - this.R))
+						this.mt.v.x = -this.mt.v.x;
+					if((this.mt.r.y < gks.ymin + this.R) || (this.mt.r.y > gks.ymax - this.R))
+						this.mt.v.y = -this.mt.v.y;
+				} // zarobi
+
+				iscrtaj(gks) {
+					gks.puniKrug(this.mt.r.x, this.mt.r.y, this.R, this.boja);
+			    } // iscrtaj
+			} // class Loptica
+			
+			function pokreni() {
+
+                class GKS {
+                    constructor(platno, xmin, xmax, ymin, ymax) {
+                        this.g = platno.getContext("2d");
+                        this.w = platno.width;
+				        this.h = platno.height;
+
+                        this.sx = this.w / (xmax - xmin);
+                        this.sy = -this.h / (ymax- ymin);
+                        this.px = -this.sx * xmin;
+                        this.py = -this.sy * ymax;
+
+                        this.xmin = xmin;
+                        this.xmax = xmax;
+                        this.ymin = ymin;
+                        this.ymax = ymax;
+                    } // constructor
+
+					ocisti() {
+						this.g.clearRect(0, 0, this.h, this.w);
+					}  // ocisti
+
+                    postaviNa(x, y) {
+                        this.g.beginPath();
+                        this.g.moveTo(this.sx * x + this.px, this.sy * y + this.py);
+                    } // postaviNa
+
+                    linijaDo(x, y) {
+                        this.g.lineTo(this.sx * x + this.px, this.sy * y + this.py);
+                    } // linijaDo
+
+                    koristiBoju(c) {
+                        this.g.strokeStyle = c;
+                    } // koristiBoju
+
+                    povuciLiniju() {
+                        this.g.stroke();
+                    } // povuciLiniju
+
+					puniKrug(x, y, R, boja) {
+				    	this.g.beginPath();
+				    	this.g.arc(this.sx * x + this.px, this.sy * y + this.py, this.sx * R, 0, 2 * Math.PI);
+                    	this.g.fillStyle = boja;
+				    	this.g.fill();
+			    	} // puniKrug
+
+					tekst(str, x, y) {
+						this.g.font = "16px Arial";
+						this.g.fillStyle = "black";
+						this.g.fillText(str, this.sx * x + this.px, this.sy * y + this.py);
+					} // tekst
+                } // class GKS
+				
+				function iscrtaj() {
+                	for(let i = 0; i < niter; i++) {
+                    	loptica1.mt.pomakni(dt, fiz.G(loptica1.mt));
+						loptica1.zarobi(gks);
+					} // for
+
+					gks.ocisti();
+                    loptica1.iscrtaj(gks);
+
+					gks.tekst("FPS: " +
+						(iframe++ / (Date.now() / 1000 - starttime)).toFixed(6), 0.5, 9.5);
+					gks.tekst("energija: " +
+						(fiz.Ek(loptica1.mt) + fiz.EpG(loptica1.mt)), 5.2, 9.5);
+
+					requestAnimationFrame(iscrtaj);
+                } // iscrtaj
+
+				// main
+				var platno1 = document.getElementById("slika1");
+				if(!platno1) alert("Greška - nema platna!");
+
+				var gks = new GKS(platno1, 0, 10, 0, 10);
+				var fiz = new Fizika(9.81);
+				var loptica1 = new Loptica("red", 0.2, 1.0, 1, 8, 2.4, 0);
+
+				var niter = 1000;
+				var dt = 1.0 / 60.0 / niter;
+
+				var iframe = 0;
+				var starttime = Date.now() / 1000;
+				
+				iscrtaj();
+            } // pokreni
+
+			window.onload = pokreni;
+		</script>
+	</head>
+
+	<body>
+		<h1>Loptica</h1>	
+		<div>
+			<canvas id="slika1" style="border:5px solid black" width="500" height="500">
+				Vaš preglednik ne podržava HTML5 canvas.
+			</canvas>
+		</div>
+	
+</body></html>

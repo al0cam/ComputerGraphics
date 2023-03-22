@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="hr"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="UTF-8">
+		<title>Područje konvergencije niza</title>
+		<script src="RG-primjer10-1_files/RG-WebGL.js"></script>
+
+		<script>
+		  window.onload = WebGLaplikacija;
+
+		  function WebGLaplikacija() {
+        var platno1 = document.getElementById("slika1");
+        var gl = platno1.getContext("webgl2");
+        if (!gl) alert("WebGL2 nije dostupan!");
+
+        var GPUprog1 = pripremiGPUprogram(gl, "vertex-shader", "fragment-shader");
+        gl.useProgram(GPUprog1); // možemo imati više GPU programa
+
+        // povezivanje s uniform varijablom u shaderu
+        GPUprog1.u_mTrans = gl.getUniformLocation(GPUprog1, "u_mTrans");
+
+        //definiranje geometrije preko javascript polja
+        var a = 2.0;
+        var vrhovi = [-a, -a,  // lijevi donji vrh
+                       a, -a,  // desni donji vrh
+                       a,  a,  // gornji desni vrh
+                      -a,  a]  // gornji lijevi vrh
+
+        function napuniSpremnike() {
+          //povezivanje s atributima u programu za sjenčanje vrhova
+          GPUprog1.a_vrhXY = gl.getAttribLocation(GPUprog1, "a_vrhXY");
+          
+          gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+          gl.enableVertexAttribArray(GPUprog1.a_vrhXY);
+          gl.vertexAttribPointer(GPUprog1.a_vrhXY, 2, gl.FLOAT, false, 0, 0);
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vrhovi), gl.STATIC_DRAW);
+        } // napuniSpremnike
+
+        function iscrtaj() {
+          gl.clearColor(0.5, 0.5, 0.5, 1);
+          gl.clear(gl.COLOR_BUFFER_BIT);
+          gl.viewport(0, 0, platno1.width, platno1.height);
+
+          // matrica transformacije
+          gl.uniformMatrix3fv(GPUprog1.u_mTrans, false,
+            [1 / a,   0  , 0,
+              0   , 1 / a, 0,
+              0   ,   0  , 1]);
+          gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+        } // iscrtaj
+
+        napuniSpremnike();
+        iscrtaj();
+      } // WebGLaplikacija
+		</script>
+
+		<script id="vertex-shader" type="x-shader/x-vertex">
+      #version 300 es
+      in vec2 a_vrhXY;
+      uniform mat3 u_mTrans;
+      out vec2 v_tocka;
+
+      void main() {
+        v_tocka = a_vrhXY;
+        gl_Position = vec4(u_mTrans * vec3(a_vrhXY, 1), 1);
+      }
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+      #version 300 es
+      precision highp float;
+      in vec2 v_tocka;
+      out vec4 bojaPiksela;
+
+      void main() {
+        float x = v_tocka.x;
+        float y = v_tocka.y;
+
+        int niter = 50;
+        int i = 0;
+        float r = sqrt(x * x + y * y);
+        while(r < 2.0 && i < niter) {
+          float xtmp = x;
+          x = x * x - y * y;
+          y = 2.0 * xtmp * y;
+          r = sqrt(x * x + y * y);
+          i++;
+        } // while
+
+        bojaPiksela = vec4(0, float(i) / float(niter), 0, 1.0);
+      }
+    </script>
+	</head>
+
+	<body>
+		<h1>Područje konvergencije niza z<sup>2</sup></h1>
+		<div>
+			<canvas id="slika1" style="border:5px solid black" width="500" height="500">
+				Vaš preglednik ne podržava HTML5 canvas.
+      </canvas>
+		</div>
+	
+</body></html>

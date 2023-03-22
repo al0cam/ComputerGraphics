@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="hr"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="UTF-8">
+		<title>WebGL2 - 2 programa za sjenčanje</title>
+		<script src="RG-primjer11-5_files/RG-WebGL.js"></script>
+
+		<script>
+		  window.onload = WebGLaplikacija;
+
+		  function WebGLaplikacija() {
+        var platno1 = document.getElementById("slika1");
+        gl = platno1.getContext("webgl2");
+        if (!gl) alert("WebGL2 nije dostupan!");
+
+        GPUprog1 = pripremiGPUprogram(gl, "vertex-shader-1", "fragment-shader-1");
+        GPUprog2 = pripremiGPUprogram(gl, "vertex-shader-2", "fragment-shader-2");
+
+        // definiranje geometrije preko javascript polja
+        let a = 0.5;
+        vrhoviLeptira =
+          [[ 0,  0,  0, 1, 0, 0],  // crveno
+           [-a,  a,  0, 1, 1, 0],  // žuto
+           [-a, -a,  0, 0.5, 0, 1],  // ljubičasto
+           [ 0,  0,  0, 1, 0, 0],  // crveno
+           [ a,  a,  0, 1, 1, 0],  // žuto
+           [ a, -a,  0, 0.5, 0, 1]]; // ljubičasto
+
+        let r = 0.9; // raspon koordinatnih osi
+        var vrhoviKoordOsi =
+          [[-r,  0,  0],
+           [ r,  0,  0],
+           [ 0,  r,  0],
+           [ 0, -r,  0]];
+          
+        function napuniSpremnike() {
+          // povezivanje s atribut varijablama u programu za sjenčanje
+          GPUprog1.a_vrhXYZ = gl.getAttribLocation(GPUprog1, "a_vrhXYZ");
+          GPUprog1.a_boja = gl.getAttribLocation(GPUprog1, "a_boja");
+          
+          leptirVAO = gl.createVertexArray();
+          gl.bindVertexArray(leptirVAO);
+          gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+          gl.enableVertexAttribArray(GPUprog1.a_vrhXYZ);
+          gl.enableVertexAttribArray(GPUprog1.a_boja);
+          gl.vertexAttribPointer(GPUprog1.a_vrhXYZ, 3, gl.FLOAT, false, 24, 0);
+          gl.vertexAttribPointer(GPUprog1.a_boja, 3, gl.FLOAT, false, 24, 12);
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vrhoviLeptira.flat()),
+            gl.STATIC_DRAW); // punjenje spremnika - podaci koji se šalju na GPU
+
+          koordOsiVAO = gl.createVertexArray();
+          gl.bindVertexArray(koordOsiVAO);
+          gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+          gl.enableVertexAttribArray(GPUprog2.a_vrhXYZ);
+          gl.vertexAttribPointer(GPUprog2.a_vrhXYZ, 3, gl.FLOAT, false, 12, 0);
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vrhoviKoordOsi.flat()),
+            gl.STATIC_DRAW); // punjenje spremnika - podaci koji se šalju na GPU
+        } // napuniSpremnike
+
+        function iscrtaj() {
+          gl.clearColor(0, 0, 0, 1);
+          gl.clear(gl.COLOR_BUFFER_BIT);
+          gl.viewport(0, 0, platno1.width, platno1.height);
+
+          // poveži sa spremnikom u kojem je leptir
+          gl.bindVertexArray(leptirVAO);          
+          gl.useProgram(GPUprog1); // možemo imati više GPU programa
+          gl.drawArrays(gl.TRIANGLES, 0, vrhoviLeptira.length);
+
+          // poveži sa spremnikom u kojem su osi
+          gl.bindVertexArray(koordOsiVAO);
+          gl.useProgram(GPUprog2); // možemo imati više GPU programa 
+          gl.drawArrays(gl.LINES, 0, vrhoviKoordOsi.length);
+        } // iscrtaj
+
+        napuniSpremnike();
+        iscrtaj();
+      } // WebGLaplikacija
+	</script>
+
+	<script id="vertex-shader-1" type="x-shader/x-vertex">
+      #version 300 es
+      in vec3 a_vrhXYZ;
+      in vec3 a_boja;
+      out vec3 v_boja;
+
+      void main() {
+        gl_Position = vec4(a_vrhXYZ, 1);
+        v_boja = a_boja;
+      }
+    </script>
+
+    <script id="fragment-shader-1" type="x-shader/x-fragment">
+      #version 300 es
+      precision highp float;
+      in vec3 v_boja;
+      out vec4 bojaPiksela;
+
+      void main() {
+        bojaPiksela = vec4(v_boja, 1);
+      }
+    </script>
+
+    <script id="vertex-shader-2" type="x-shader/x-vertex">
+      #version 300 es
+      in vec3 a_vrhXYZ;
+
+      void main() {
+        gl_Position = vec4(a_vrhXYZ, 1);
+      }
+    </script>
+
+    <script id="fragment-shader-2" type="x-shader/x-fragment">
+      #version 300 es
+      precision highp float;
+      out vec4 bojaPiksela;
+
+      void main() {
+        bojaPiksela = vec4(1, 1, 1, 1); // bijela boja
+      }
+    </script>
+	</head>
+
+	<body>
+		<h1>WebGL2 - 2 programa za sjenčanje</h1>
+		<div>
+			<canvas id="slika1" style="border:5px solid black" width="500" height="500">
+				Vaš preglednik ne podržava HTML5 canvas.
+      </canvas>
+		</div>
+	
+</body></html>

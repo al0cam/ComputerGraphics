@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+        <meta charset="utf-8">
+        <title>tekstura</title>
+
+        <script src="tekstura1_files/MT2D.js"></script>
+        <script src="tekstura1_files/RG-WebGL.js"></script>
+
+        <style>
+          li { 
+            margin-bottom: 3px;
+            margin-top: 3px;
+          }
+
+        </style>
+
+        <script language="JavaScript">
+
+        window.onload = WEBGLapp;
+
+        async function loadImage(url) {
+          const slika = new Image();
+          slika.src = url;
+          try {
+            await slika.decode();
+          } catch(err) {
+            console.log('Greska:',err);
+          }
+          return slika;
+        } 
+
+        async function WEBGLapp() {
+            var slika = await loadImage('pozega.png');
+            
+            if (!slika.width) {
+              alert('Nema teksture!');
+              return;
+            }
+
+            var kan = document.getElementById("kan");
+
+            //definiranje geometrije preko javascript polja
+            var vrhovi = [0,slika.height, slika.width,slika.height, 0,0, slika.width,0];
+            //var tex = [0,1, 1,1, 0,0, 1,0]; //treba ukljuciti gl.UNPACK_FLIP_Y_WEBGL da tekstura ne bude preokrenuta 
+            var tex = [0,0, 1,0, 0,1, 1,1];
+
+            //bufferi
+            var vrhoviBuffer, texBuffer;
+
+            //vertex array object
+            var vao;
+
+            var mat = new MT2D();
+
+            var gl = null, program1 = null;
+            var tekstura; //za kreiranje teksture
+
+            var kan_width, kan_height; //dimenzije canvasa
+
+            function initBuffers() {
+              vrhoviBuffer = gl.createBuffer();
+              texBuffer = gl.createBuffer();
+              vao = gl.createVertexArray();
+
+              tekstura = gl.createTexture();
+              gl.bindTexture(gl.TEXTURE_2D, tekstura);
+              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
+              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+              gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, slika);
+              gl.bindTexture(gl.TEXTURE_2D, null);
+
+              gl.bindVertexArray(vao);
+              gl.enableVertexAttribArray(0);
+              gl.enableVertexAttribArray(1);
+
+              gl.bindBuffer(gl.ARRAY_BUFFER, vrhoviBuffer);
+              gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+              gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vrhovi), gl.STATIC_DRAW);
+              gl.bindBuffer(gl.ARRAY_BUFFER, null);
+              
+              gl.bindBuffer(gl.ARRAY_BUFFER, texBuffer);
+              gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 0, 0);
+              gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(tex), gl.STATIC_DRAW);
+              gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+              gl.bindVertexArray(null);
+            }
+
+          function drawScene() {
+              gl.clearColor(0.5, 0.5, 0.5, 1);
+              gl.clear(gl.COLOR_BUFFER_BIT);
+
+              //poigrajte se s razlicitim opcijama za viewport
+              gl.viewport(10, 10, kan_width, kan_height);
+              //gl.viewport(10, 10, slika.width, slika.height);
+
+              gl.bindVertexArray(vao);
+
+              gl.bindTexture(gl.TEXTURE_2D, tekstura);
+              gl.uniform1i(program.u_slika, 0);
+
+              mat.identitet();
+              
+              mat.projekcija2D(0,kan_width,0,kan_height);
+                 
+              gl.uniformMatrix3fv(program.u_pmatrica, false, mat.poljeMatrica());
+
+              gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            }
+
+            function WebGL_aplikacija() {
+              gl = kan.getContext("webgl2");
+              if (!gl) alert("WEBGL2 nije dostupan!");
+              program = pripremiGPUprogram(gl, "vertex-shader", "fragment-shader");
+              gl.useProgram(program);
+              program.u_pmatrica = gl.getUniformLocation(program, "u_pmatrica");
+              program.u_slika = gl.getUniformLocation(program, "u_slika");
+
+              kan_width = kan.width;
+              kan_height = kan.height;
+
+              //da crta teksturu od gore prema dolje
+              //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
+              initBuffers();
+              drawScene();
+            }
+
+            WebGL_aplikacija();
+
+        }
+        </script>
+
+        <script id="vertex-shader" type="x-shader/x-vertex">
+            #version 300 es
+            layout(location = 0) in vec2 a_position;
+            layout(location = 1) in vec2 a_tekstura;
+
+            uniform mat3 u_pmatrica;
+            out vec2 v_tekstura;
+
+            void main() {
+              vec3 vek = u_pmatrica * vec3(a_position,1);
+              gl_Position = vec4(vek.xy, 0, 1);
+              v_tekstura = a_tekstura;
+            }
+        </script>
+
+        <script id="fragment-shader" type="x-shader/x-fragment">
+            #version 300 es
+            precision mediump float;
+
+            uniform sampler2D u_slika;
+            in vec2 v_tekstura;
+            out vec4 outColor;
+
+            void main() {
+              outColor = texture(u_slika, v_tekstura);
+            }
+        </script>
+
+    </head>
+
+    <body>
+      <div id="naslov"> <h1>WebGL2 - Učitavanje teksture</h1> </div>
+      <canvas id="kan" tabindex="0" style="border:5px solid black" width="600" height="400">
+          Your browser does not support HTML5 canvas.
+      </canvas>
+      <ul>
+        <li>Poigrajte se s parametrima u <code>gl.viewport</code> metodi i dimenzijama canvasa i obratite pažnju na originalne dimenzije slike.</li>
+        <li>WebGL koordinate teksture interpretira na sljedeći način:
+        <ul> 
+          <li><code>(0,0)</code> predstavlja gornji lijevi kut</li>
+          <li><code>(1,0)</code> predstavlja gornji desni kut</li>
+          <li><code>(0,1)</code> predstavlja donji lijevi kut</li>
+          <li><code>(1,1)</code> predstavlja donji desni kut</li>
+        </ul>
+        </li>
+        <li>Ako uključimo opciju <code>gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)</code>, tada WebGL koordinate teksture interpretira na sljedeći način:
+        <ul> 
+          <li><code>(0,0)</code> predstavlja donji lijevi kut</li>
+          <li><code>(1,0)</code> predstavlja donji desni kut</li>
+          <li><code>(0,1)</code> predstavlja gornji lijevi kut</li>
+          <li><code>(1,1)</code> predstavlja gornji desni kut</li>
+        </ul>
+        </li>
+      </ul>
+    
+
+
+</body></html>
